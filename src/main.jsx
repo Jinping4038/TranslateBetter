@@ -15,7 +15,7 @@ function App(){
 const [page,setPage]=useState('home'),[index,setIndex]=useState(0),[translation,setTranslation]=useState(''),[hint,setHint]=useState(false),[saved,setSaved]=useState(()=>read('tb-saved',[])),[completed,setCompleted]=useState(()=>read('tb-completed',[])),[toast,setToast]=useState(''),[difficulty,setDifficulty]=useState(()=>read('tb-level','Intermediate'));
 const [showAnswer,setShowAnswer]=useState(false),[showFeedback,setShowFeedback]=useState(false);
 const ex=exercises[index%exercises.length];
-const todayCount=completed.filter(item=>new Date(item.date).toDateString()===new Date().toDateString()).length;
+const todayCount=new Set(completed.filter(item=>new Date(item.date).toDateString()===new Date().toDateString()).map(item=>item.zh)).size;
 function notify(message){setToast(message);setTimeout(()=>setToast(''),2500)}
 function submit(e){e.preventDefault();if(!translation.trim())return;setShowFeedback(true);const next=[...completed,{text:translation,zh:ex.zh,date:new Date().toISOString()}];setCompleted(next);localStorage.setItem('tb-completed',JSON.stringify(next));}
 function next(){setIndex((index+1)%10);setTranslation('');setHint(false);setShowAnswer(false);setShowFeedback(false);setPage('practice')}
