@@ -6,3 +6,5 @@
 .feedback-error{background:#fff0ef;color:#ad3932;border-radius:8px;padding:15px;font-size:13px}
 
 .feedback-content{flex:1;min-width:0}.score-heading{display:flex;align-items:center;justify-content:space-between;gap:16px}.score-heading h4{margin-bottom:0}.score-badge{background:#ffffffa6;padding:4px 10px;border-radius:20px;white-space:nowrap}.feedback-card.unscored{background:#f2f5f9;color:#61718a}
+
+@media(max-width:760px){.workspace{flex-direction:column}.sidebar{display:block;width:100%;padding:8px 12px;border-right:0;border-bottom:1px solid var(--line)}.sidebar>div:first-child{display:flex;overflow-x:auto;gap:4px}.sidebar button{width:auto;flex-shrink:0;padding:10px 9px;font-size:10px;margin:0;gap:6px}.sidebar button svg{width:16px;height:16px}.sidebar .goal{display:none}}
