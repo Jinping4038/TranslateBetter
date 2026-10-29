@@ -4,3 +4,5 @@
 .inline-actions{justify-content:flex-end}.inline-actions>button{min-width:180px}.practice-tools{display:flex;align-items:center;gap:15px;margin-top:14px}.practice-tools>button:last-child{margin-left:auto}.inline-result.feedback{width:100%;padding:25px 0 0;margin-top:25px;border-left:0;border-top:1px solid var(--line);background:transparent}.inline-result .feedback-card{padding:20px}.inline-result .feedback-card p{font-size:12px}.inline-result .feedback-card h4{font-size:13px}.inline-result .feedback-card strong{font-size:12px}.inline-result .reference p{font-size:14px}@media(max-width:760px){.inline-actions>button{min-width:0;flex:1;padding:13px 10px}.practice-tools{gap:8px}.practice-tools .hint-button{padding:10px;font-size:10px}}
 
 .feedback-error{background:#fff0ef;color:#ad3932;border-radius:8px;padding:15px;font-size:13px}
+
+.feedback-content{flex:1;min-width:0}.score-heading{display:flex;align-items:center;justify-content:space-between;gap:16px}.score-heading h4{margin-bottom:0}.score-badge{background:#ffffffa6;padding:4px 10px;border-radius:20px;white-space:nowrap}.feedback-card.unscored{background:#f2f5f9;color:#61718a}
