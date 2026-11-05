@@ -65,3 +65,26 @@
 .feedback-card.green .score-badge{color:#175940}
 .feedback-card.amber .score-badge{color:#704600}
 .feedback-card.coral .score-badge{color:#8b2e2b}
+
+.progress-page h1{margin:0 0 8px;font-size:clamp(25px,3vw,36px)}
+.progress-page>p{margin:0 0 24px}
+.progress-stats,.progress-charts,.progress-insight-grid{display:grid;gap:16px}
+.progress-stats{grid-template-columns:repeat(3,minmax(0,1fr))}
+.progress-charts{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);margin-block:20px}
+.progress-panel,.progress-insights{border:1px solid #e1e8f4;border-radius:16px;padding:18px;background:#fff;min-width:0}
+.progress-panel h2,.progress-insights h2{font-size:17px;margin:0}
+.progress-stat,.progress-panel-heading{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.progress-stat strong,.skill-ring strong{display:block;font-size:28px;margin-top:6px}
+.progress-stat>span{display:grid;place-items:center;width:46px;height:46px;flex:none;border-radius:50%;color:#1756c8;background:#e9f1ff}
+.progress-stat>.pink{color:#aa3047;background:#fdebf0}.progress-stat>.purple{color:#7542bf;background:#f0e9fd}
+.progress-panel-heading select{max-width:48%;padding:7px;border:1px solid #e1e8f4;border-radius:9px;background:white;color:inherit}
+.progress-trend{display:block;width:100%;margin-top:12px}
+.progress-trend text{fill:#45536a;font-size:13px}.progress-trend line{stroke:#e1e8f4}.progress-trend polygon{fill:#e8f1ff}.progress-trend polyline,.progress-trend circle{stroke:#1466ff;stroke-width:3}.progress-trend polyline{fill:none}.progress-trend circle{fill:white}
+.skill-breakdown{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:16px;margin-top:22px}
+.skill-ring{display:grid;place-content:center;text-align:center;border:15px solid #e8edf6;border-radius:50%;width:136px;height:136px;flex:none}
+.skill-breakdown ul{flex:1;min-width:175px;list-style:none;margin:0;padding:0}.skill-breakdown li{display:flex;align-items:center;gap:7px;margin:10px 0;font-size:12px}.skill-breakdown li strong{margin-inline-start:auto;white-space:nowrap}.skill-dot{width:9px;height:9px;border-radius:50%;flex:none}
+.progress-empty{color:var(--muted);margin:28px 0}
+.progress-insights{background:#f0f6ff}.progress-insights h2{display:flex;align-items:center;gap:8px}.progress-insights svg{color:#1466ff;flex:none}.progress-insight-grid{grid-template-columns:repeat(2,minmax(0,1fr));margin-top:14px}.progress-insight-grid article{display:flex;gap:12px;background:#fff;border-radius:12px;padding:14px}.progress-insight-grid p{margin:4px 0 0;color:#45536a;font-size:13px}
+@media(max-width:1000px){.progress-charts{grid-template-columns:1fr}}
+@media(max-width:620px){.progress-stats,.progress-insight-grid{grid-template-columns:1fr}}
+.skill-ring{background-origin:padding-box,border-box;background-clip:padding-box,border-box}
