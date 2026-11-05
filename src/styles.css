@@ -40,3 +40,7 @@
 .history-version-heading h3{margin:0}
 .saved-practice{flex-shrink:0}
 @media(max-width:540px){.saved-card{flex-wrap:wrap}.saved-history-link{flex-basis:calc(100% - 48px)}.saved-practice{margin-inline-start:auto}}
+
+.saved-card{position:relative}
+.saved-history-link::after{content:"";position:absolute;inset:0;border-radius:inherit}
+.saved-card>.saved-practice,.saved-card>.icon-button{position:relative;z-index:1}
