@@ -35,3 +35,8 @@
 .history-version{margin-top:12px}
 .revision-view .saved-detail-title{margin-top:20px}
 @media(max-width:540px){.comparison-versions{grid-template-columns:1fr}.revision-scores th,.revision-scores td{padding:6px;font-size:12px}}
+
+.history-version-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px}
+.history-version-heading h3{margin:0}
+.saved-practice{flex-shrink:0}
+@media(max-width:540px){.saved-card{flex-wrap:wrap}.saved-history-link{flex-basis:calc(100% - 48px)}.saved-practice{margin-inline-start:auto}}
