@@ -44,3 +44,11 @@
 .saved-card{position:relative}
 .saved-history-link::after{content:"";position:absolute;inset:0;border-radius:inherit}
 .saved-card>.saved-practice,.saved-card>.icon-button{position:relative;z-index:1}
+
+.hint-content{flex:1;min-width:0}
+.hint-content strong{display:block;margin-bottom:4px}
+.hint-content p+p,.hint-content .hint-button{margin-top:10px}
+.feedback-card.green{color:#175940}
+.feedback-card.amber{color:#704600}
+.feedback-card.coral{color:#8b2e2b}
+.feedback-card p{opacity:1}
