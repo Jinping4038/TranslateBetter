@@ -52,3 +52,5 @@
 .feedback-card.amber{color:#704600}
 .feedback-card.coral{color:#8b2e2b}
 .feedback-card p{opacity:1}
+
+.sentence-navigation{display:flex;flex-wrap:wrap;gap:8px;margin-inline-start:auto}
