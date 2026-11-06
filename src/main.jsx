@@ -51,10 +51,21 @@ let data;try{data=await response.json()}catch{throw new Error('The feedback back
 if(!response.ok)throw new Error(data.error||'Feedback is unavailable. Please try again.');
 if(!data.feedback||!['meaning','grammar','naturalness','improvedTranslation'].every(key=>typeof data.feedback[key]==='string'&&data.feedback[key].trim()))throw new Error('The AI returned incomplete feedback. Please try again.');
 if(activeRequest.current!==controller)return;
-const attempt={text:draft.trim(),scores:data.feedback.scores,date:new Date().toISOString()};
+const attempt={text:draft.trim(),scores:data.feedback.scores,date:new Date().toISOString(),revision:revising};
 setVersions(revising?[...versions,attempt]:[attempt]);
 setFeedback(data.feedback);
 if(revising){
+  const collection=read('tb-saved',[]);
+  const bookmarked=collection.find(sentence=>sentence.zh===ex.zh);
+  if(bookmarked){
+    const previous=savedHistory(bookmarked);
+    const history=[...(previous.length?previous:versions),attempt];
+    const updated={...bookmarked,history,translation:attempt.text};
+    const updatedCollection=collection.map(sentence=>sentence.zh===ex.zh?updated:sentence);
+    localStorage.setItem('tb-saved',JSON.stringify(updatedCollection));
+    setSaved(updatedCollection);
+    setSelectedSentence(current=>current?.zh===ex.zh?updated:current);
+  }
   setTranslation(draft);
   setPage(current=>current==='revision'?'comparison':current);
 }
@@ -137,9 +148,10 @@ return <div className="app"><header><button className="brand" onClick={()=>setPa
   <h2>Your Translation History</h2>
   {savedHistory(selectedSentence).length?savedHistory(selectedSentence).map((version,i)=><section className="history-version" key={i}>
     <div className="history-version-heading">
-      <h3>{i===0?'Original Translation':`Saved Version ${i+1}`}</h3>
+      <h3>{version.revision?`Revision ${savedHistory(selectedSentence).slice(0,i+1).filter(item=>item.revision).length}`:i===0?'Original Translation':`Saved Version ${i+1}`}</h3>
       <button type="button" className="icon-button" aria-label={`Delete translation version ${i+1}`} onClick={()=>deleteSavedVersion(i)}><Trash2 size={17}/></button>
     </div>
+    {version.date&&<time className="muted" dateTime={version.date}>{new Date(version.date).toLocaleString()}</time>}
     <p>{version.text}</p>
     {version.scores&&<div className="history-scores">{scoreCategories.map(([key,label])=><span key={key}>{label} {formatScore(version.scores[key])}</span>)}</div>}
   </section>):<p className="muted">Practice this sentence and save your translation to start its history.</p>}
