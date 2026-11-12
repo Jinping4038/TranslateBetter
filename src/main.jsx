@@ -77,7 +77,7 @@ if(revising){
   setTranslation(draft);
   setPage(current=>current==='revision'?'comparison':current);
 }
-const next=[...completed,{...attempt,zh:ex.zh,revision:revising}];setCompleted(next);localStorage.setItem('tb-completed',JSON.stringify(next));
+const next=[...completed,{...attempt,mode:'practice',zh:ex.zh,revision:revising}];setCompleted(next);localStorage.setItem('tb-completed',JSON.stringify(next));
 }catch(error){if(activeRequest.current===controller)setFeedbackError(error.name==='AbortError'?'The request timed out. Please try again.':error instanceof TypeError?'Could not connect to the feedback service. Check your connection and Cloudflare setup.':error.message)}
 finally{clearTimeout(timeout);if(activeRequest.current===controller){activeRequest.current=null;setLoading(false)}}
 }

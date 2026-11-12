@@ -1,26 +1,26 @@
 import React, {useEffect, useRef, useState} from 'react';
-import exercises from './exercises.js';
+import {assessmentBankVersion, assessmentForms, selectAssessmentForm} from './assessment-exercises.js';
 import {assessmentSkills, validAssessmentScores, summarizeAssessment, assessmentStrengths} from './assessment-data.js';
 
 const draftKey = 'tb-assessment-draft';
 function loadDraft() {
   try {
     const value = JSON.parse(localStorage.getItem(draftKey));
-    if (value?.id && value.items?.length === 5 && value.items.every(item =>
-      typeof item.zh === 'string' && typeof item.en === 'string' && typeof item.answer === 'string'
+    if (value?.bankVersion === assessmentBankVersion && value?.id && value.items?.length === 5 && value.items.every(item =>
+      assessmentForms.flat().some(sentence => sentence.zh === item.zh) && typeof item.en === 'string' && typeof item.answer === 'string'
     )) return value;
   } catch {}
   return null;
 }
-function createDraft(round) {
+function createDraft(results) {
   return {
     id: crypto.randomUUID(),
+    bankVersion: assessmentBankVersion,
     index: 0,
     submitted: false,
-    items: Array.from({length: 5}, (_, index) => {
-      const exercise = exercises[(round * 5 + index) % exercises.length];
-      return {zh: exercise.zh, en: exercise.en, answer: '', scores: null};
-    }),
+    items: selectAssessmentForm(results).map(exercise => ({
+      ...exercise, answer: '', scores: null,
+    })),
   };
 }
 
@@ -45,7 +45,7 @@ export default function Assessment({assessments, onComplete, onPractice, onProgr
   }
   function start() {
     try {
-      persist(createDraft(assessments.length));
+      persist(createDraft(assessments));
       setResult(null);
       setError('');
     } catch { setError('Your browser could not save this assessment. Please check available storage.'); }
@@ -90,7 +90,7 @@ export default function Assessment({assessments, onComplete, onPractice, onProgr
       }
       const answers = current.items.map(({zh, answer, scores}) => ({zh, text: answer.trim(), scores}));
       const completed = {
-        id: current.id, date: new Date().toISOString(), answers, ...summarizeAssessment(answers),
+        id: current.id, mode: 'assessment', date: new Date().toISOString(), answers, ...summarizeAssessment(answers),
       };
       onComplete(completed);
       setResult(completed);
@@ -115,7 +115,7 @@ export default function Assessment({assessments, onComplete, onPractice, onProgr
       <h3>{label}</h3><strong>{result.skills[key].toFixed(1)} / 5</strong>
     </section>)}</div>
     <p className="assessment-summary">{assessmentStrengths(result.skills)}</p>
-    <p className="muted">{assessments[0]?.id === result.id ? 'This assessment establishes your baseline. Take another after more practice to compare results.' : 'View Progress to compare this assessment with your previous results.'}</p>
+    <p className="muted">{assessments[0]?.id === result.id ? 'This assessment establishes your baseline. Take another after more practice to compare results.' : 'View Progress to compare this assessment with your baseline.'}</p>
     <div className="revision-actions">
       <button className="primary" onClick={onPractice}>Start Practicing</button>
       <button className="secondary" onClick={onProgress}>View Progress</button>
