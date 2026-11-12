@@ -107,3 +107,7 @@
 .hero-actions{display:flex;align-items:center;flex-wrap:wrap;gap:12px}
 .check-level{color:#1269f8;border:1.5px solid #6095ff;background:#ffffff80;padding:14px 20px;font-size:13px;font-weight:700}
 .check-level:hover{background:#fff}
+
+.revision-picker{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:18px 0}
+.revision-picker label{font-weight:600;font-size:13px}
+.revision-picker select{max-width:100%}

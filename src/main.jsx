@@ -5,6 +5,7 @@ import './styles.css';
 import exercises from './exercises.js';
 import Progress from './Progress.jsx';
 import Assessment from './Assessment.jsx';
+import {appendVersions, sameVersion} from './revision-history.js';
 const nav=[['practice','Practice',Pencil],['saved','My Sentences',Bookmark],['assessment','Assessment',FileCheck2],['progress','Progress',ChartNoAxesColumnIncreasing],['settings','Settings',Settings]];
 function read(key, fallback){try{return JSON.parse(localStorage.getItem(key))??fallback}catch{return fallback}}
 const scoreCategories=[['meaning','Meaning accuracy'],['grammar','Grammar'],['naturalness','Naturalness']];
@@ -31,6 +32,7 @@ const [page,setPage]=useState('home'),[index,setIndex]=useState(0),[translation,
 const [showAnswer,setShowAnswer]=useState(false),[showFeedback,setShowFeedback]=useState(false);
 const [feedback,setFeedback]=useState(null),[feedbackError,setFeedbackError]=useState(''),[loading,setLoading]=useState(false);
 const [revision,setRevision]=useState('');
+const [selectedRevision,setSelectedRevision]=useState(null);
 const [versions,setVersions]=useState([]),[selectedSentence,setSelectedSentence]=useState(null);
 const [assessments,setAssessments]=useState(()=>read('tb-assessments',[]));
 function completeAssessment(result){
@@ -40,7 +42,7 @@ function completeAssessment(result){
   setAssessments(next);
 }
 const activeRequest=useRef(null);
-function clearFeedback(){setVersions([]);activeRequest.current?.abort();activeRequest.current=null;setLoading(false);setShowFeedback(false);setFeedback(null);setFeedbackError('');}
+function clearFeedback(){setSelectedRevision(null);setVersions([]);activeRequest.current?.abort();activeRequest.current=null;setLoading(false);setShowFeedback(false);setFeedback(null);setFeedbackError('');}
 const ex=exercises[index];
 const hasNextSentence=index+1<exercises.length;
 const todayCount=new Set(completed.filter(item=>new Date(item.date).toDateString()===new Date().toDateString()).map(item=>item.zh)).size;
@@ -59,15 +61,17 @@ let data;try{data=await response.json()}catch{throw new Error('The feedback back
 if(!response.ok)throw new Error(data.error||'Feedback is unavailable. Please try again.');
 if(!data.feedback||!['meaning','grammar','naturalness','improvedTranslation'].every(key=>typeof data.feedback[key]==='string'&&data.feedback[key].trim()))throw new Error('The AI returned incomplete feedback. Please try again.');
 if(activeRequest.current!==controller)return;
-const attempt={text:draft.trim(),scores:data.feedback.scores,date:new Date().toISOString(),revision:revising};
-setVersions(revising?[...versions,attempt]:[attempt]);
+const attempt={id:crypto.randomUUID(),text:draft.trim(),scores:data.feedback.scores,date:new Date().toISOString(),revision:revising};
+const updatedVersions=revising?appendVersions(versions,[attempt]):[attempt];
+setVersions(updatedVersions);
+setSelectedRevision(null);
 setFeedback(data.feedback);
 if(revising){
   const collection=read('tb-saved',[]);
   const bookmarked=collection.find(sentence=>sentence.zh===ex.zh);
   if(bookmarked){
     const previous=savedHistory(bookmarked);
-    const history=[...(previous.length?previous:versions),attempt];
+    const history=appendVersions(previous,updatedVersions);
     const updated={...bookmarked,history,translation:attempt.text};
     const updatedCollection=collection.map(sentence=>sentence.zh===ex.zh?updated:sentence);
     localStorage.setItem('tb-saved',JSON.stringify(updatedCollection));
@@ -96,12 +100,13 @@ function reviseTranslation(){
   setFeedbackError('');
   setPage('revision');
 }
+const comparedRevision=versions[selectedRevision??versions.length-1];
 const existingSentence=saved.find(s=>s.zh===ex.zh);
 const savedCurrentTranslation=existingSentence?.translation===translation.trim()&&
-  versions.every(version=>existingSentence.history?.includes(version));
+  versions.every(version=>savedHistory(existingSentence).some(existing=>sameVersion(existing,version)));
 function saveMyTranslation(){
   const previous=existingSentence?savedHistory(existingSentence):[];
-  const history=[...previous,...versions.filter(version=>!previous.includes(version))];
+  const history=appendVersions(previous,versions);
   const entry={...existingSentence,...ex,translation:translation.trim(),history};
   const next=existingSentence?saved.map(s=>s.zh===ex.zh?entry:s):[...saved,entry];
   localStorage.setItem('tb-saved',JSON.stringify(next));
@@ -139,11 +144,19 @@ return <div className="app"><header><button className="brand" onClick={()=>setPa
 {page==='assessment'?<Assessment assessments={assessments} onComplete={completeAssessment} onPractice={()=>setPage('practice')} onProgress={()=>setPage('progress')}/>:page==='comparison'?<main className="practice-main revision-view">
   <h1>Your Improvement</h1>
   <p className="revision-description">Compare your original and revised translations.</p>
+  <div className="revision-picker">
+    <label htmlFor="revision-choice">Compare original with</label>
+    <select id="revision-choice" value={selectedRevision??versions.length-1} onChange={event=>setSelectedRevision(Number(event.target.value))}>
+      {versions.slice(1).map((version,position)=><option key={version.id||position} value={position+1}>
+        Revision {position+1}{position===versions.length-2?' (latest)':''}{version.date?' · '+new Date(version.date).toLocaleString():''}
+      </option>)}
+    </select>
+  </div>
   <div className="comparison-versions">
     <section><h2>Original Translation</h2><p>{versions[0].text}</p></section>
-    <section><h2>Revised Translation</h2><p>{versions.at(-1).text}</p></section>
+    <section><h2>Revised Translation</h2><p>{comparedRevision.text}</p></section>
   </div>
-  <ScoreComparison original={versions[0]} revised={versions.at(-1)}/>
+  <ScoreComparison original={versions[0]} revised={comparedRevision}/>
   <div className="revision-actions">
     <button type="button" className="secondary" onClick={()=>setPage('practice')}>View AI Feedback</button>
     <button type="button" className="secondary" onClick={saveMyTranslation} disabled={savedCurrentTranslation}><Bookmark size={17}/>{savedCurrentTranslation?'Saved to My Sentences':'Save to My Sentences'}</button>
