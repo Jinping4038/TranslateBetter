@@ -1,33 +1,34 @@
-// Each form covers concession, conditions, alternatives, past events, and polite requests.
-export const assessmentBankVersion = 1;
+// Independent transfer tasks. Each form balances linked ideas, time/aspect,
+// reference or comparison, and practical instructions without mirroring Practice templates.
+export const assessmentBankVersion = 2;
 export const assessmentForms = [
   [
-    {zh:'虽然搬到新城市让我有些紧张，但我很期待认识新朋友。',en:"Although moving to a new city makes me a little nervous, I'm looking forward to making new friends."},
-    {zh:'只要提前把材料准备好，我们就能按时完成演示。',en:'As long as we prepare the materials in advance, we can finish the presentation on time.'},
-    {zh:'与其反复抱怨计划有变，不如一起想一个新的办法。',en:'Instead of repeatedly complaining about the change of plans, we should work together to find a new solution.'},
-    {zh:'我到办公室时，其他人已经开始讨论客户的建议了。',en:"By the time I arrived at the office, the others had already started discussing the client's suggestions."},
-    {zh:'你能告诉我是否需要提前报名参加这次活动吗？',en:'Could you tell me whether I need to register for this event in advance?'},
+    {zh:'没有购物小票，这家商店就不给退货。',en:'This shop will not accept a return unless you have the receipt.'},
+    {zh:'那块架子太窄了，放不下打印机。',en:'The shelf is too narrow for the printer to fit on it.'},
+    {zh:'电梯和楼梯都无法通往屋顶。',en:'Neither the lift nor the stairs provides access to the roof.'},
+    {zh:'牌子上写着，所有访客进入实验室都要佩戴证件。',en:'The sign says that all visitors must wear identification when entering the laboratory.'},
+    {zh:'我的笔记本电脑还在维修，最快周四才能取回。',en:'My laptop is still being repaired, and Thursday is the earliest I can collect it.'},
   ],
   [
-    {zh:'虽然第一次演讲没有想象中顺利，但我比以前更有信心了。',en:"Although my first speech didn't go as smoothly as I had expected, I feel more confident than before."},
-    {zh:'只要大家及时分享进度，我们就能避免重复工作。',en:'As long as everyone shares their progress promptly, we can avoid doing the same work twice.'},
-    {zh:'与其一次安排太多任务，不如先完成最紧急的一项。',en:'Instead of scheduling too many tasks at once, we should finish the most urgent one first.'},
-    {zh:'我们赶到电影院的时候，电影已经放映了十分钟。',en:'By the time we reached the cinema, the film had already been playing for ten minutes.'},
-    {zh:'你能告诉我这份申请是否还需要其他文件吗？',en:'Could you tell me whether this application requires any additional documents?'},
+    {zh:'屋内的烟雾散去后，消防员才允许住户进去。',en:'The firefighters allowed the residents inside only after the smoke had cleared.'},
+    {zh:'装着玻璃杯的箱子需要竖着搬，不能平放。',en:'The box containing the glasses needs to be carried upright and must not be laid flat.'},
+    {zh:'这两张照片中，左边那张拍摄得更早。',en:'Of these two photographs, the one on the left was taken earlier.'},
+    {zh:'所有借出的设备都必须在月底归还。',en:'All equipment that has been lent out must be returned by the end of the month.'},
+    {zh:'住在楼下的邻居昨晚敲门，问那辆自行车是不是我的。',en:'The neighbour who lives downstairs knocked on my door last night and asked if the bicycle was mine.'},
   ],
   [
-    {zh:'虽然这门课程需要花不少时间，但它让我学会了更有条理地思考。',en:'Although this course takes quite a lot of time, it has taught me to think in a more organized way.'},
-    {zh:'只要把每一步解释清楚，新同事就能独立完成这项任务。',en:'As long as we explain each step clearly, our new colleague will be able to complete this task independently.'},
-    {zh:'与其等到最后一天才开始，不如每天完成一点。',en:'Instead of waiting until the last day to start, we should do a little each day.'},
-    {zh:'她回到会议室时，经理已经回答了大家的问题。',en:"By the time she returned to the meeting room, the manager had already answered everyone's questions."},
-    {zh:'你能告诉我这张通行证是否可以在周末使用吗？',en:'Could you tell me whether this pass can be used on weekends?'},
+    {zh:'这张票一旦写上姓名，就不能转让给别人。',en:'Once a name has been written on this ticket, it cannot be transferred to anyone else.'},
+    {zh:'没有人接听前台的电话，我只好留了一条留言。',en:'No one answered the phone at reception, so I had to leave a message.'},
+    {zh:'清单上的价格已经包含安装费，无须另外付款。',en:'The prices on the list already include installation, so no extra payment is required.'},
+    {zh:'我一直在等的那批货昨天终于送到了，可是少了两个箱子。',en:'The shipment I had been waiting for finally arrived yesterday, but two boxes were missing.'},
+    {zh:'负责保管钥匙的人今天请假了，我们进不了储藏室。',en:'The person responsible for the keys is on leave today, leaving us unable to enter the storeroom.'},
   ],
   [
-    {zh:'虽然新的软件一开始很难上手，但现在它帮我们节省了很多时间。',en:'Although the new software was difficult to use at first, it now saves us a lot of time.'},
-    {zh:'只要认真核对地址，包裹就不容易寄错地方。',en:'As long as we check the address carefully, the package is unlikely to be sent to the wrong place.'},
-    {zh:'与其急着给出结论，不如先确认我们掌握的信息是否完整。',en:'Instead of rushing to a conclusion, we should first check whether we have all the information.'},
-    {zh:'我打开电脑时，同事已经把修改后的文件发过来了。',en:'By the time I turned on my computer, my colleague had already sent me the revised document.'},
-    {zh:'你能告诉我参观期间是否允许拍照吗？',en:'Could you tell me whether taking photos is allowed during the visit?'},
+    {zh:'停车场满了的情况下，司机可以把车停在体育馆后面。',en:'When the car park is full, drivers can park behind the sports centre.'},
+    {zh:'他把闹钟设在六点，却忘了打开声音。',en:'He set his alarm for six but forgot to turn the sound on.'},
+    {zh:'她交来的两份草稿都没有署名。',en:'Neither of the two drafts she handed in had her name on it.'},
+    {zh:'管理员要求所有人把椅子放回原处，再离开大厅。',en:'The caretaker asked everyone to put the chairs back where they belonged before leaving the hall.'},
+    {zh:'原来放在入口处的捐款箱已经移到服务台旁边了。',en:'The donation box that used to be at the entrance has been moved next to the information desk.'},
   ],
 ];
 

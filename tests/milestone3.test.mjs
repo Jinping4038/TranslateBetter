@@ -7,7 +7,7 @@ import {validatedPracticeScores, validPracticeAttempt, readPracticeSession} from
 import {appendRecord} from '../src/storage.js';
 import {appendVersions} from '../src/revision-history.js';
 import {summarizeAssessment} from '../src/assessment-data.js';
-import {assessmentForms} from '../src/assessment-exercises.js';
+import {assessmentForms, assessmentBankVersion} from '../src/assessment-exercises.js';
 
 function storage() {
   const entries = new Map();
@@ -174,7 +174,7 @@ test('Milestone 3 regression flows with isolated storage and mocked AI',async()=
     };
     for(let round=0;round<2;round++){
       globalThis.fetch=async()=>Response.json({feedback:{...aiFeedback,scores:round===0?{meaning:1,grammar:1,naturalness:1}:{meaning:5,grammar:5,naturalness:5}}});
-      const draft={id:'assessment'+round,bankVersion:1,index:4,submitted:false,items:assessmentForms[round].map(q=>({...q,answer:'An independent answer.',scores:null}))};
+      const draft={id:'assessment'+round,bankVersion:assessmentBankVersion,index:4,submitted:false,items:assessmentForms[round].map(q=>({...q,answer:'An independent answer.',scores:null}))};
       localStorage.setItem('tb-assessment-draft',JSON.stringify(draft));
       const assessmentHarness=hooks();globalThis.__testReact=assessmentHarness.react;
       const {default:Assessment}=await componentModule('src/Assessment.jsx');
