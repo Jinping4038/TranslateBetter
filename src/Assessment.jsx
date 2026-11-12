@@ -92,7 +92,7 @@ export default function Assessment({assessments, onComplete, onPractice, onProgr
       const completed = {
         id: current.id, mode: 'assessment', date: new Date().toISOString(), answers, ...summarizeAssessment(answers),
       };
-      onComplete(completed);
+      await onComplete(completed);
       setResult(completed);
     } catch (issue) {
       if (controllerRef.current === controller) {

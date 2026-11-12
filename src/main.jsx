@@ -1,21 +1,23 @@
-import React, {useState, useRef} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import {createRoot} from 'react-dom/client';
 import {BookOpen, Pencil, Bookmark, ChartNoAxesColumnIncreasing, Settings, Lightbulb, ArrowRight, RotateCcw, Send, Volume2, Copy, Check, Sparkles, Target, FileCheck2, MessagesSquare, Heart, X, Home, Trash2} from 'lucide-react';
 import './styles.css';
 import exercises from './exercises.js';
 import Progress from './Progress.jsx';
 import Assessment from './Assessment.jsx';
+import {validatedPracticeScores, validPracticeAttempt, validScore, readPracticeSession} from './practice-data.js';
+import {appendRecord, updateRecords, readRecords} from './storage.js';
 import {appendVersions, sameVersion} from './revision-history.js';
 const nav=[['practice','Practice',Pencil],['saved','My Sentences',Bookmark],['assessment','Assessment',FileCheck2],['progress','Progress',ChartNoAxesColumnIncreasing],['settings','Settings',Settings]];
 function read(key, fallback){try{return JSON.parse(localStorage.getItem(key))??fallback}catch{return fallback}}
 const scoreCategories=[['meaning','Meaning accuracy'],['grammar','Grammar'],['naturalness','Naturalness']];
-const formatScore=score=>Number.isInteger(score)?`${score}/5`:'—';
+const formatScore=score=>validScore(score)?`${score}/5`:'—';
 function ScoreComparison({original,revised}){
   return <table className="revision-scores">
     <thead><tr><th scope="col">Category</th><th scope="col">Original</th><th scope="col">Revised</th><th scope="col">Change</th></tr></thead>
     <tbody>{scoreCategories.map(([key,label])=>{
       const before=original.scores?.[key],after=revised.scores?.[key];
-      const change=Number.isInteger(before)&&Number.isInteger(after)?after-before:null;
+      const change=validScore(before)&&validScore(after)?after-before:null;
       return <tr key={key}><th scope="row">{label}</th><td>{formatScore(before)}</td><td>{formatScore(after)}</td>
         <td className={change>0?'score-gain':change<0?'score-loss':''}>{change===null?'—':change>0?`+${change}`:change}</td></tr>;
     })}</tbody>
@@ -25,27 +27,44 @@ function savedHistory(entry){
   return entry.history?.length?entry.history:entry.translation?[{text:entry.translation}]:[];
 }
 function FeedbackCards({feedback}){
-  return <>{[[Target,'Meaning Accuracy','meaning'],[FileCheck2,'Grammar','grammar'],[MessagesSquare,'Naturalness','naturalness']].map(([Icon,title,key])=>{const rawScore=feedback.scores?.[key];const score=Number.isInteger(rawScore)&&rawScore>=0&&rawScore<=5?rawScore:null;const color=score===null?'unscored':score===5?'green':score>=3?'amber':'coral';return <article className={`feedback-card feedback-category-${key} ${color}`} key={key}><span className="feedback-icon"><Icon size={21}/></span><div className="feedback-content"><div className="score-heading"><h4>{title}</h4>{score!==null&&<strong className="score-badge" aria-label={`${title}: ${score} out of 5`}>{score}/5</strong>}</div><p>{feedback[key]}</p></div></article>})}{!feedback.scores&&<p className="demo-note">Scores will appear after the updated Cloudflare Worker is deployed.</p>}</>;
+  return <>{[[Target,'Meaning Accuracy','meaning'],[FileCheck2,'Grammar','grammar'],[MessagesSquare,'Naturalness','naturalness']].map(([Icon,title,key])=>{const rawScore=feedback.scores?.[key];const score=validScore(rawScore)?rawScore:null;const color=score===null?'unscored':score===5?'green':score>=3?'amber':'coral';return <article className={`feedback-card feedback-category-${key} ${color}`} key={key}><span className="feedback-icon"><Icon size={21}/></span><div className="feedback-content"><div className="score-heading"><h4>{title}</h4>{score!==null&&<strong className="score-badge" aria-label={`${title}: ${score} out of 5`}>{score}/5</strong>}</div><p>{feedback[key]}</p></div></article>})}{!feedback.scores&&<p className="demo-note">Scores will appear after the updated Cloudflare Worker is deployed.</p>}</>;
 }
 function App(){
-const [page,setPage]=useState('home'),[index,setIndex]=useState(0),[translation,setTranslation]=useState(''),[hint,setHint]=useState(0),[saved,setSaved]=useState(()=>read('tb-saved',[])),[completed,setCompleted]=useState(()=>read('tb-completed',[])),[toast,setToast]=useState(''),[difficulty,setDifficulty]=useState(()=>read('tb-level','Intermediate'));
-const [showAnswer,setShowAnswer]=useState(false),[showFeedback,setShowFeedback]=useState(false);
-const [feedback,setFeedback]=useState(null),[feedbackError,setFeedbackError]=useState(''),[loading,setLoading]=useState(false);
-const [revision,setRevision]=useState('');
-const [selectedRevision,setSelectedRevision]=useState(null);
-const [versions,setVersions]=useState([]),[selectedSentence,setSelectedSentence]=useState(null);
+const [restored]=useState(readPracticeSession);
+const [page,setPage]=useState(restored?.page||'home'),[index,setIndex]=useState(restored?.index<exercises.length?restored.index:0),[translation,setTranslation]=useState(restored?.translation||''),[hint,setHint]=useState(restored?.hint||0),[saved,setSaved]=useState(()=>read('tb-saved',[])),[completed,setCompleted]=useState(()=>read('tb-completed',[])),[toast,setToast]=useState(''),[difficulty,setDifficulty]=useState(()=>read('tb-level','Intermediate'));
+const [showAnswer,setShowAnswer]=useState(restored?.showAnswer||false),[showFeedback,setShowFeedback]=useState(restored?.showFeedback||false);
+const [feedback,setFeedback]=useState(restored?.feedback||null),[feedbackError,setFeedbackError]=useState(''),[loading,setLoading]=useState(false);
+const [revision,setRevision]=useState(restored?.revision||'');
+const [selectedRevision,setSelectedRevision]=useState(restored?.selectedRevision??null);
+const [versions,setVersions]=useState(restored?.versions||[]),[selectedSentence,setSelectedSentence]=useState(null);
 const [assessments,setAssessments]=useState(()=>read('tb-assessments',[]));
-function completeAssessment(result){
-  const previous=read('tb-assessments',[]);
-  const next=previous.some(item=>item.id===result.id)?previous:[...previous,result];
-  localStorage.setItem('tb-assessments',JSON.stringify(next));
-  setAssessments(next);
+async function completeAssessment(result){
+  setAssessments(await appendRecord('tb-assessments',result));
 }
+useEffect(()=>{
+  try {
+    sessionStorage.setItem('tb-active-practice',JSON.stringify({
+      page:page==='saved-detail'?'saved':page,index,translation,hint,showAnswer,showFeedback,
+      feedback,revision,selectedRevision,versions,
+    }));
+  } catch { /* Completed records remain in localStorage if tab-draft storage is unavailable. */ }
+},[page,index,translation,hint,showAnswer,showFeedback,feedback,revision,selectedRevision,versions]);
+useEffect(()=>{
+  function syncRecords(event){
+    try {
+      if(event.key==='tb-completed')setCompleted(readRecords(event.key));
+      if(event.key==='tb-assessments')setAssessments(readRecords(event.key));
+      if(event.key==='tb-saved')setSaved(readRecords(event.key));
+    } catch { notify('Another tab saved unreadable data. Existing records have been preserved.'); }
+  }
+  window.addEventListener('storage',syncRecords);
+  return ()=>window.removeEventListener('storage',syncRecords);
+},[]);
 const activeRequest=useRef(null);
 function clearFeedback(){setSelectedRevision(null);setVersions([]);activeRequest.current?.abort();activeRequest.current=null;setLoading(false);setShowFeedback(false);setFeedback(null);setFeedbackError('');}
 const ex=exercises[index];
 const hasNextSentence=index+1<exercises.length;
-const todayCount=new Set(completed.filter(item=>new Date(item.date).toDateString()===new Date().toDateString()).map(item=>item.zh)).size;
+const todayCount=new Set(completed.filter(validPracticeAttempt).filter(item=>new Date(item.date).toDateString()===new Date().toDateString()).map(item=>item.zh)).size;
 function notify(message){setToast(message);setTimeout(()=>setToast(''),2500)}
 async function submit(e){
 e.preventDefault();
@@ -60,28 +79,31 @@ const response=await fetch('https://translatebetter-api.jinping4038.workers.dev/
 let data;try{data=await response.json()}catch{throw new Error('The feedback backend is not ready yet. Please finish deploying the Cloudflare Worker code.')}
 if(!response.ok)throw new Error(data.error||'Feedback is unavailable. Please try again.');
 if(!data.feedback||!['meaning','grammar','naturalness','improvedTranslation'].every(key=>typeof data.feedback[key]==='string'&&data.feedback[key].trim()))throw new Error('The AI returned incomplete feedback. Please try again.');
+const scores=validatedPracticeScores(data.feedback.scores);
+if(data.feedback.overall!==undefined&&(!validScore(data.feedback.overall)||Math.abs(data.feedback.overall-scores.overall)>0.051)){
+  throw new Error('Scoring returned an invalid or inconsistent overall score. Please request feedback again.');
+}
 if(activeRequest.current!==controller)return;
-const attempt={id:crypto.randomUUID(),text:draft.trim(),scores:data.feedback.scores,date:new Date().toISOString(),revision:revising};
+const attempt={id:crypto.randomUUID(),text:draft.trim(),scores,overall:scores.overall,date:new Date().toISOString(),revision:revising};
+setCompleted(await appendRecord('tb-completed',{...attempt,mode:'practice',zh:ex.zh}));
+if(activeRequest.current!==controller)return;
 const updatedVersions=revising?appendVersions(versions,[attempt]):[attempt];
 setVersions(updatedVersions);
 setSelectedRevision(null);
 setFeedback(data.feedback);
 if(revising){
-  const collection=read('tb-saved',[]);
-  const bookmarked=collection.find(sentence=>sentence.zh===ex.zh);
-  if(bookmarked){
-    const previous=savedHistory(bookmarked);
-    const history=appendVersions(previous,updatedVersions);
-    const updated={...bookmarked,history,translation:attempt.text};
-    const updatedCollection=collection.map(sentence=>sentence.zh===ex.zh?updated:sentence);
-    localStorage.setItem('tb-saved',JSON.stringify(updatedCollection));
-    setSaved(updatedCollection);
-    setSelectedSentence(current=>current?.zh===ex.zh?updated:current);
-  }
+  try {
+    const collection=await updateRecords('tb-saved',previous=>previous.map(sentence=>{
+      if(sentence.zh!==ex.zh)return sentence;
+      return {...sentence,history:appendVersions(savedHistory(sentence),updatedVersions),translation:attempt.text};
+    }));
+    setSaved(collection);
+    setSelectedSentence(current=>collection.find(sentence=>sentence.zh===current?.zh)||current);
+  } catch (error) { notify(error.message); }
   setTranslation(draft);
   setPage(current=>current==='revision'?'comparison':current);
 }
-const next=[...completed,{...attempt,mode:'practice',zh:ex.zh,revision:revising}];setCompleted(next);localStorage.setItem('tb-completed',JSON.stringify(next));
+
 }catch(error){if(activeRequest.current===controller)setFeedbackError(error.name==='AbortError'?'The request timed out. Please try again.':error instanceof TypeError?'Could not connect to the feedback service. Check your connection and Cloudflare setup.':error.message)}
 finally{clearTimeout(timeout);if(activeRequest.current===controller){activeRequest.current=null;setLoading(false)}}
 }
@@ -105,24 +127,34 @@ const hasRevisions=versions.length>1;
 const existingSentence=saved.find(s=>s.zh===ex.zh);
 const savedCurrentTranslation=existingSentence?.translation===translation.trim()&&
   versions.every(version=>savedHistory(existingSentence).some(existing=>sameVersion(existing,version)));
-function saveMyTranslation(){
-  const previous=existingSentence?savedHistory(existingSentence):[];
-  const history=appendVersions(previous,versions);
-  const entry={...existingSentence,...ex,translation:translation.trim(),history};
-  const next=existingSentence?saved.map(s=>s.zh===ex.zh?entry:s):[...saved,entry];
-  localStorage.setItem('tb-saved',JSON.stringify(next));
-  setSaved(next);
-  notify('Translation saved to My Sentences');
+async function saveMyTranslation(){
+  try {
+    const collection=await updateRecords('tb-saved',previous=>{
+      const existing=previous.find(sentence=>sentence.zh===ex.zh);
+      const entry={...existing,...ex,translation:translation.trim(),history:appendVersions(existing?savedHistory(existing):[],versions)};
+      return existing?previous.map(sentence=>sentence.zh===ex.zh?entry:sentence):[...previous,entry];
+    });
+    setSaved(collection);
+    notify('Translation saved to My Sentences');
+  } catch(error){notify(error.message);}
 }
-function deleteSavedVersion(index){
+async function deleteSavedVersion(index){
   if(!window.confirm('Delete this saved translation version?'))return;
-  const history=savedHistory(selectedSentence).filter((_,position)=>position!==index);
-  const updated={...selectedSentence,history,translation:history.at(-1)?.text};
-  const next=saved.map(sentence=>sentence.zh===updated.zh?updated:sentence);
-  localStorage.setItem('tb-saved',JSON.stringify(next));
-  setSaved(next);
-  setSelectedSentence(updated);
-  notify('Translation version deleted');
+  const version=savedHistory(selectedSentence)[index];
+  try{
+    const collection=await updateRecords('tb-saved',previous=>previous.map(sentence=>{
+      if(sentence.zh!==selectedSentence.zh)return sentence;
+      const history=savedHistory(sentence).filter(item=>!sameVersion(item,version));
+      return {...sentence,history,translation:history.at(-1)?.text};
+    }));
+    setSaved(collection);
+    setSelectedSentence(collection.find(sentence=>sentence.zh===selectedSentence.zh));
+    notify('Translation version deleted');
+  }catch(error){notify(error.message);}
+}
+async function removeSavedSentence(sentence){
+  try{setSaved(await updateRecords('tb-saved',previous=>previous.filter(item=>item.zh!==sentence.zh)));}
+  catch(error){notify(error.message);}
 }
 function practiceSaved(sentence){
   const exerciseIndex=exercises.findIndex(item=>item.zh===sentence.zh);
@@ -134,7 +166,12 @@ function practiceSaved(sentence){
   setShowAnswer(false);
   setPage('practice');
 }
-function save(){if(saved.some(s=>s.zh===ex.zh)){notify('This sentence is already in your collection');return}const next=[...saved,ex];setSaved(next);localStorage.setItem('tb-saved',JSON.stringify(next));notify('Sentence saved to your collection')}
+async function save(){
+  try {
+    setSaved(await updateRecords('tb-saved',previous=>previous.some(sentence=>sentence.zh===ex.zh)?previous:[...previous,ex]));
+    notify('Sentence saved to My Sentences');
+  } catch(error){notify(error.message);}
+}
 function speak(){if('speechSynthesis' in window){speechSynthesis.cancel();const utterance=new SpeechSynthesisUtterance(ex.zh);utterance.lang='zh-CN';speechSynthesis.speak(utterance)}else notify('Audio is unavailable in this browser')}
 const sourceSentence=<div className="sentence"><span>{ex.zh}</span><button onClick={speak} className="icon-button" aria-label="Listen to Chinese sentence"><Volume2 size={21}/></button></div>;
 const referenceAnswer=showAnswer&&<section id="reference-answer" className="feedback inline-result" aria-label="Reference answer"><h3><BookOpen size={19}/>Reference answer</h3><div className="reference"><p>{ex.en}</p><button className="icon-button" onClick={async()=>{try{await navigator.clipboard.writeText(ex.en);notify('Reference answer copied')}catch{notify('Copy is unavailable in this browser')}}} aria-label="Copy reference answer"><Copy size={17}/></button></div><button className="save-button" onClick={save}><Bookmark size={15}/>{saved.some(s=>s.zh===ex.zh)?'Saved to my sentences':'Save this sentence'}</button></section>;
@@ -223,6 +260,6 @@ page==='progress'?<Progress completed={completed} assessments={assessments}/>:<m
     const first=history[0].scores?.[key],last=history.at(-1).scores?.[key];
     return <span key={key}>{label} {Number.isInteger(first)&&first!==last?`${formatScore(first)} → `:''}{formatScore(last)}</span>;
   })}</span>}</span>
-</button><button type="button" className="secondary saved-practice" onClick={()=>practiceSaved(s)}>Practice Again</button><button className="icon-button" aria-label="Remove saved sentence" onClick={()=>{const next=saved.filter(item=>item.zh!==s.zh);setSaved(next);localStorage.setItem('tb-saved',JSON.stringify(next))}}><Trash2 size={17}/></button></article>):<div className="empty"><Bookmark size={35}/><h3>Your collection starts with one sentence.</h3><p>Save a reference answer after completing an exercise.</p><button className="primary" onClick={()=>setPage('practice')}>Start practicing <ArrowRight size={17}/></button></div>:page==='progress'?<><div className="stats">{[[completed.length,'Translations submitted'],[saved.length,'Sentences saved'],[`${Math.min(todayCount,10)}/10`,'Daily goal']].map(([number,label])=><article key={label}><strong>{number}</strong><span>{label}</span></article>)}</div><h3>Recent practice</h3>{completed.length?completed.slice(-5).reverse().map((item,i)=><article className="saved-card" key={i}><Check size={20}/><div><h3>{item.zh}</h3><p>{item.text}</p></div></article>):<p className="empty">Your first practice session is waiting for you.</p>}</>:<div className="settings-card"><label htmlFor="level">Practice level</label><select id="level" value={difficulty} onChange={e=>{setDifficulty(e.target.value);localStorage.setItem('tb-level',JSON.stringify(e.target.value))}}>{['Beginner','Intermediate','Advanced'].map(v=><option key={v}>{v}</option>)}</select><p className="muted">This preference labels your session. The collection includes 100 intermediate Chinese-to-English exercises.</p></div>}</main>}
+</button><button type="button" className="secondary saved-practice" onClick={()=>practiceSaved(s)}>Practice Again</button><button className="icon-button" aria-label="Remove saved sentence" onClick={()=>removeSavedSentence(s)}><Trash2 size={17}/></button></article>):<div className="empty"><Bookmark size={35}/><h3>Your collection starts with one sentence.</h3><p>Save a reference answer after completing an exercise.</p><button className="primary" onClick={()=>setPage('practice')}>Start practicing <ArrowRight size={17}/></button></div>:page==='progress'?<><div className="stats">{[[completed.length,'Translations submitted'],[saved.length,'Sentences saved'],[`${Math.min(todayCount,10)}/10`,'Daily goal']].map(([number,label])=><article key={label}><strong>{number}</strong><span>{label}</span></article>)}</div><h3>Recent practice</h3>{completed.length?completed.slice(-5).reverse().map((item,i)=><article className="saved-card" key={i}><Check size={20}/><div><h3>{item.zh}</h3><p>{item.text}</p></div></article>):<p className="empty">Your first practice session is waiting for you.</p>}</>:<div className="settings-card"><label htmlFor="level">Practice level</label><select id="level" value={difficulty} onChange={e=>{setDifficulty(e.target.value);localStorage.setItem('tb-level',JSON.stringify(e.target.value))}}>{['Beginner','Intermediate','Advanced'].map(v=><option key={v}>{v}</option>)}</select><p className="muted">This preference labels your session. The collection includes 100 intermediate Chinese-to-English exercises.</p></div>}</main>}
 </div>}{toast&&<div className="toast" role="status"><Check size={17}/>{toast}</div>}</div>}
 createRoot(document.getElementById('root')).render(<App/>);

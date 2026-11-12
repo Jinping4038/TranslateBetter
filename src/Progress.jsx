@@ -1,3 +1,4 @@
+import {validPracticeAttempt, validScore} from './practice-data.js';
 import React, {useState} from 'react';
 import {assessmentSkills, assessmentStrengths} from './assessment-data.js';
 import {BookOpen, ChartNoAxesColumnIncreasing, Pencil, Sparkles, Target} from 'lucide-react';
@@ -7,7 +8,7 @@ const skills = [
   ['grammar', 'Grammar', '#f5c344'],
   ['naturalness', 'Naturalness', '#f87279'],
 ];
-const valid = value => Number.isInteger(value) && value >= 0 && value <= 5;
+const valid = validScore;
 const mean = values => values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : null;
 const scoreText = value => value === null ? '—' : value.toFixed(1);
 const overall = scores => mean(skills.map(([key]) => scores?.[key]).filter(valid));
@@ -20,7 +21,7 @@ function weekStart(date) {
 }
 
 export default function Progress({completed: activity, assessments = []}) {
-  const completed = activity.filter(attempt => attempt.mode !== 'assessment');
+  const completed = activity.filter(validPracticeAttempt);
   const [category, setCategory] = useState('overall');
   const average = mean(completed.map(attempt => overall(attempt.scores)).filter(value => value !== null));
   const breakdown = skills.map(([key, label, color]) => ({
@@ -67,7 +68,7 @@ export default function Progress({completed: activity, assessments = []}) {
           {[0,1,2,3,4,5].map(value=><g key={value}><text x="12" y={189-value*32}>{value}</text><line x1="40" x2="502" y1={184-value*32} y2={184-value*32}/></g>)}
           {points.length>1&&<polygon points={`${points[0].x},184 ${points.map(({x,y})=>x+','+y).join(' ')} ${points.at(-1).x},184`}/>}
           <polyline points={points.map(({x,y})=>x+','+y).join(' ')}/>
-          {points.map(({x,y,label,value})=><circle key={label} cx={x} cy={y} r="5"><title>{label}: {scoreText(value)} / 5</title></circle>)}
+          {points.map(({x,y,label,value})=><circle key={label} cx={x} cy={y} r="5"><title>{label+': '+scoreText(value)+' / 5'}</title></circle>)}
           {weeks.map(({label},index)=><text key={label} x={52+index*110} y="210" textAnchor="middle">{label}</text>)}
         </svg>:<p className="progress-empty">Get AI feedback to start tracking your weekly scores.</p>}
       </section>
