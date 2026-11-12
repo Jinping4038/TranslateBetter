@@ -89,3 +89,17 @@
 .feedback-card.coral{--feedback-surface:#fdf6f5;--feedback-icon-bg:#fce1de;--feedback-icon-color:#ac332d}
 .feedback-card.amber{--feedback-surface:#fffbef;--feedback-icon-bg:#fcecc8;--feedback-icon-color:#865300}
 .feedback-card.green{--feedback-surface:#f2fbf7;--feedback-icon-bg:#d5f2e4;--feedback-icon-color:#14684e}
+
+.assessment-page h1{font-size:30px;margin-top:0}
+.assessment-page h2{font-size:20px;margin-top:26px}
+.assessment-page h3{font-size:14px}
+.assessment-progress{display:block;width:100%;height:8px;accent-color:#1269f8;margin:0 0 24px}
+.assessment-overall strong{display:block;font-size:34px;margin-top:8px;color:#174fa8}
+.assessment-summary{margin-top:24px}
+.assessment-progress-section{margin-bottom:20px}
+.assessment-stats{margin:20px 0}
+.assessment-stats>div{background:#f1f6ff;border-radius:10px;padding:16px}
+.assessment-stats strong{display:block;font-size:24px;margin-top:8px}
+.assessment-table-scroll{overflow:auto}
+.assessment-changes{padding-left:20px;color:#45536a}
+.assessment-changes li{margin-bottom:8px}

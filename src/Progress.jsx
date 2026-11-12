@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import {assessmentSkills, assessmentStrengths} from './assessment-data.js';
 import {BookOpen, ChartNoAxesColumnIncreasing, Pencil, Sparkles, Target} from 'lucide-react';
 
 const skills = [
@@ -18,7 +19,7 @@ function weekStart(date) {
   return start;
 }
 
-export default function Progress({completed}) {
+export default function Progress({completed, assessments = []}) {
   const [category, setCategory] = useState('overall');
   const average = mean(completed.map(attempt => overall(attempt.scores)).filter(value => value !== null));
   const breakdown = skills.map(([key, label, color]) => ({
@@ -47,18 +48,18 @@ export default function Progress({completed}) {
   const change = points.length > 1 ? points.at(-1).value - points[0].value : null;
   const stats = [
     ['Sentences Practiced', new Set(completed.map(attempt => attempt.zh)).size, BookOpen, 'blue'],
-    ['Average Score', average === null ? '—' : scoreText(average) + ' / 5', ChartNoAxesColumnIncreasing, 'pink'],
+    ['Average Practice Score', average === null ? '—' : scoreText(average) + ' / 5', ChartNoAxesColumnIncreasing, 'pink'],
     ['Revisions Completed', completed.filter(attempt => attempt.revision).length, Pencil, 'purple'],
   ];
   return <main className="utility progress-page">
     <h1>Your Progress</h1>
-    <p className="muted">Track your practice and see how your English translation is improving over time.</p>
+    <p className="muted">Practice scores reflect learning with hints and AI feedback. Assessment scores measure independent translation before feedback.</p>
     <div className="progress-stats">{stats.map(([label, value, Icon, color]) => <section className="progress-panel progress-stat" key={label}>
       <div>{label}<strong>{value}</strong></div><span className={color}><Icon size={24}/></span>
     </section>)}</div>
     <div className="progress-charts">
       <section className="progress-panel">
-        <div className="progress-panel-heading"><h2>Weekly Average Score</h2><select aria-label="Score category" value={category} onChange={event=>setCategory(event.target.value)}>
+        <div className="progress-panel-heading"><h2>Practice Score Trend</h2><select aria-label="Score category" value={category} onChange={event=>setCategory(event.target.value)}>
           <option value="overall">Overall</option>{skills.map(([key,label])=><option key={key} value={key}>{label}</option>)}
         </select></div>
         {points.length ? <svg className="progress-trend" viewBox="0 0 525 220" role="img" aria-label={points.map(point=>point.label+' '+scoreText(point.value)+' out of 5').join(', ')}>
@@ -70,13 +71,14 @@ export default function Progress({completed}) {
         </svg>:<p className="progress-empty">Get AI feedback to start tracking your weekly scores.</p>}
       </section>
       <section className="progress-panel">
-        <h2>Skill Breakdown</h2>
+        <h2>Practice Skill Breakdown</h2>
         <div className="skill-breakdown">
           <div className="skill-ring" style={segments.length ? {backgroundImage: `linear-gradient(white,white),conic-gradient(${segments.join(",")})`, borderColor: "transparent"} : undefined}><strong>{scoreText(average)}</strong><span>Average</span></div>
           <ul>{breakdown.map(({label,color,value})=><li key={label}><span className="skill-dot" style={{background:color}}/>{label}<strong>{value===null?'—':scoreText(value)+' / 5'}</strong></li>)}</ul>
         </div>
       </section>
     </div>
+    <AssessmentProgress assessments={assessments}/>
     <section className="progress-insights">
       <h2><Sparkles size={21}/> Insights</h2>
       <div className="progress-insight-grid">
@@ -85,4 +87,35 @@ export default function Progress({completed}) {
       </div>
     </section>
   </main>;
+}
+
+function AssessmentProgress({assessments}) {
+  const latest = assessments.at(-1);
+  const previous = assessments.at(-2);
+  const change = previous ? latest.overall - previous.overall : null;
+  return <section className="progress-panel assessment-progress-section">
+    <h2>Assessment Progress</h2>
+    <p className="muted">Independent translation, scored only after all five answers are submitted.</p>
+    {!latest ? <p>Take your first assessment to establish a baseline.</p> : <>
+      <div className="progress-stats assessment-stats">
+        <div><span>{previous ? 'Latest Assessment' : 'Baseline Assessment'}</span><strong>{latest.overall.toFixed(1)} / 5</strong></div>
+        <div><span>Previous Assessment</span><strong>{previous ? previous.overall.toFixed(1) + ' / 5' : '—'}</strong></div>
+        <div><span>Change since previous</span><strong>{change === null ? 'Baseline' : (change > 0 ? '+' : '') + change.toFixed(1)}</strong></div>
+      </div>
+      <h3>Assessment History</h3>
+      <div className="assessment-table-scroll"><table className="revision-scores">
+        <thead><tr><th scope="col">Date</th><th scope="col">Overall</th>{assessmentSkills.map(([key,label])=><th scope="col" key={key}>{label}</th>)}</tr></thead>
+        <tbody>{[...assessments].reverse().map(result=><tr key={result.id}>
+          <th scope="row">{new Date(result.date).toLocaleString()}{result.id===assessments[0].id?' · Baseline':''}</th>
+          <td>{result.overall.toFixed(1)} / 5</td>
+          {assessmentSkills.map(([key])=><td key={key}>{result.skills[key].toFixed(1)} / 5</td>)}
+        </tr>)}</tbody>
+      </table></div>
+      <p>{assessmentStrengths(latest.skills)}</p>
+      {previous && <ul className="assessment-changes">{assessmentSkills.map(([key,label])=>{
+        const difference=latest.skills[key]-previous.skills[key];
+        return <li key={key}>{label} {Math.abs(difference)<0.05?'held steady':(difference>0?'increased':'decreased')+' by '+Math.abs(difference).toFixed(1)} since your previous assessment.</li>;
+      })}</ul>}
+    </>}
+  </section>;
 }
