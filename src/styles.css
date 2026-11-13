@@ -111,3 +111,8 @@
 .revision-picker{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:18px 0}
 .revision-picker label{font-weight:600;font-size:13px}
 .revision-picker select{max-width:100%}
+
+.assessment-summary-card{margin-top:20px}
+.assessment-summary-values{display:flex;flex-wrap:wrap;gap:12px 30px}
+.assessment-summary-values strong{margin-inline-start:8px}
+.assessment-page .assessment-progress-section{margin-top:28px}

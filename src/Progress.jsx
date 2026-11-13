@@ -1,6 +1,5 @@
 import {validPracticeAttempt, validScore} from './practice-data.js';
 import React, {useState} from 'react';
-import {assessmentSkills, assessmentStrengths} from './assessment-data.js';
 import {BookOpen, ChartNoAxesColumnIncreasing, Pencil, Sparkles, Target} from 'lucide-react';
 
 const skills = [
@@ -20,7 +19,7 @@ function weekStart(date) {
   return start;
 }
 
-export default function Progress({completed: activity, assessments = []}) {
+export default function Progress({completed: activity, assessments = [], onAssessmentHistory}) {
   const completed = activity.filter(validPracticeAttempt);
   const [category, setCategory] = useState('overall');
   const average = mean(completed.map(attempt => overall(attempt.scores)).filter(value => value !== null));
@@ -53,6 +52,9 @@ export default function Progress({completed: activity, assessments = []}) {
     ['Average Practice Score', average === null ? '—' : scoreText(average) + ' / 5', ChartNoAxesColumnIncreasing, 'pink'],
     ['Revisions Completed', completed.filter(attempt => attempt.revision).length, Pencil, 'purple'],
   ];
+  const assessmentHistory = [...assessments].sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const baselineAssessment = assessmentHistory[0];
+  const latestAssessment = assessmentHistory.at(-1);
   return <main className="utility progress-page">
     <h1>Your Progress</h1>
     <p className="muted">Practice scores reflect learning with hints and AI feedback. Assessment scores measure independent translation before feedback.</p>
@@ -80,7 +82,6 @@ export default function Progress({completed: activity, assessments = []}) {
         </div>
       </section>
     </div>
-    <AssessmentProgress assessments={assessments}/>
     <section className="progress-insights">
       <h2><Sparkles size={21}/> Insights</h2>
       <div className="progress-insight-grid">
@@ -88,38 +89,14 @@ export default function Progress({completed: activity, assessments = []}) {
         <article><Target size={23}/><div><strong>Focus Area</strong><p>{focus?`${focus.label} has your lowest average score (${scoreText(focus.value)} / 5). Review your feedback in this area as you practice.`:'Complete a scored translation to see which skill to focus on.'}</p></div></article>
       </div>
     </section>
+    <section className="progress-panel assessment-summary-card">
+      <h2>Independent Assessment</h2>
+      <p className="muted">Scores from independent translation completed before feedback.</p>
+      {latestAssessment?<div className="assessment-summary-values">
+        <p>Latest Assessment <strong>{latestAssessment.overall.toFixed(1)} / 5</strong></p>
+        <p>Baseline Assessment <strong>{baselineAssessment.overall.toFixed(1)} / 5</strong></p>
+      </div>:<p>Complete your first assessment to establish a baseline.</p>}
+      <button type="button" className="secondary" onClick={onAssessmentHistory}>View Assessment History</button>
+    </section>
   </main>;
-}
-
-function AssessmentProgress({assessments}) {
-  const history = [...assessments].sort((a,b) => new Date(a.date)-new Date(b.date));
-  const baseline = history[0];
-  const latest = history.at(-1);
-  const hasComparison = history.length > 1;
-  const change = hasComparison ? latest.overall - baseline.overall : null;
-  return <section className="progress-panel assessment-progress-section">
-    <h2>Assessment Progress</h2>
-    <p className="muted">Independent translation, scored only after all five answers are submitted.</p>
-    {!latest ? <p>Take your first assessment to establish a baseline.</p> : <>
-      <div className="progress-stats assessment-stats">
-        <div><span>Baseline Assessment</span><strong>{baseline.overall.toFixed(1)} / 5</strong></div>
-        <div><span>Latest Assessment</span><strong>{hasComparison ? latest.overall.toFixed(1) + ' / 5' : '—'}</strong></div>
-        <div><span>Change from Baseline</span><strong>{change === null ? 'Baseline' : (change > 0 ? '+' : '') + change.toFixed(1)}</strong></div>
-      </div>
-      <h3>Assessment History</h3>
-      <div className="assessment-table-scroll"><table className="revision-scores">
-        <thead><tr><th scope="col">Date</th><th scope="col">Overall</th>{assessmentSkills.map(([key,label])=><th scope="col" key={key}>{label}</th>)}</tr></thead>
-        <tbody>{[...history].reverse().map(result=><tr key={result.id}>
-          <th scope="row">{new Date(result.date).toLocaleString()}{result.id===baseline.id?' · Baseline':''}</th>
-          <td>{result.overall.toFixed(1)} / 5</td>
-          {assessmentSkills.map(([key])=><td key={key}>{result.skills[key].toFixed(1)} / 5</td>)}
-        </tr>)}</tbody>
-      </table></div>
-      <p>{assessmentStrengths(latest.skills)}</p>
-      {hasComparison && <ul className="assessment-changes">{assessmentSkills.map(([key,label])=>{
-        const difference=latest.skills[key]-baseline.skills[key];
-        return <li key={key}>{label} {Math.abs(difference)<0.05?'held steady':(difference>0?'increased':'decreased')+' by '+Math.abs(difference).toFixed(1)} from your baseline assessment.</li>;
-      })}</ul>}
-    </>}
-  </section>;
 }

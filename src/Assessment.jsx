@@ -1,3 +1,4 @@
+import AssessmentHistory from './AssessmentHistory.jsx';
 import React, {useEffect, useRef, useState} from 'react';
 import {assessmentBankVersion, assessmentForms, selectAssessmentForm} from './assessment-exercises.js';
 import {assessmentSkills, validAssessmentScores, summarizeAssessment, assessmentStrengths} from './assessment-data.js';
@@ -24,10 +25,12 @@ function createDraft(results) {
   };
 }
 
-export default function Assessment({assessments, onComplete, onPractice, onProgress}) {
+export default function Assessment({assessments, onComplete, onPractice, onProgress, showHistory = false}) {
   const [draft, setDraft] = useState(loadDraft);
   const [result, setResult] = useState(() => {
     const previousDraft = loadDraft();
+    const latest = [...assessments].sort((a,b)=>new Date(a.date)-new Date(b.date)).at(-1);
+    if(showHistory || !previousDraft)return latest || null;
     return assessments.find(item => item.id === previousDraft?.id) || null;
   });
   const [busy, setBusy] = useState(false);
@@ -115,12 +118,16 @@ export default function Assessment({assessments, onComplete, onPractice, onProgr
       <h3>{label}</h3><strong>{result.skills[key].toFixed(1)} / 5</strong>
     </section>)}</div>
     <p className="assessment-summary">{assessmentStrengths(result.skills)}</p>
-    <p className="muted">{assessments[0]?.id === result.id ? 'This assessment establishes your baseline. Take another after more practice to compare results.' : 'View Progress to compare this assessment with your baseline.'}</p>
+    <p className="muted">{assessments[0]?.id === result.id ? 'This assessment establishes your baseline. Take another after more practice to compare results.' : 'Compare this assessment with your baseline in the history below.'}</p>
     <div className="revision-actions">
       <button className="primary" onClick={onPractice}>Start Practicing</button>
       <button className="secondary" onClick={onProgress}>View Progress</button>
-      <button className="secondary" onClick={start}>Take Another Assessment</button>
+      <button className="secondary" onClick={()=>{
+        if(draft&&!assessments.some(item=>item.id===draft.id)){setResult(null);setError('');}
+        else start();
+      }}>{draft&&!assessments.some(item=>item.id===draft.id)?'Resume Assessment':'Take Another Assessment'}</button>
     </div>
+    <AssessmentHistory assessments={assessments}/>
     {error && <p className="feedback-error" role="alert">{error}</p>}
   </main>;
 
@@ -132,6 +139,7 @@ export default function Assessment({assessments, onComplete, onPractice, onProgr
       <p>Your first result establishes a baseline. Later assessments use rotated sentences so you can compare your performance over time.</p>
       <button className="primary" onClick={start}>Start Assessment</button>
     </section>
+    <AssessmentHistory assessments={assessments}/>
     {error && <p className="feedback-error" role="alert">{error}</p>}
   </main>;
 

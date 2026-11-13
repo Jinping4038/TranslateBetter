@@ -194,8 +194,35 @@ test('Milestone 3 regression flows with isolated storage and mocked AI',async()=
     const {default:Progress}=await componentModule('src/Progress.jsx');
     const progress=harness.render(Progress,{completed:JSON.parse(localStorage.getItem('tb-completed')),assessments});
     assert.ok(text(progress).includes('Average Practice Score4.0 / 5'));
-    const assessmentSection=nodes(progress).find(node=>node.type?.name==='AssessmentProgress');
-    assert.ok(text(assessmentSection.type(assessmentSection.props)).includes('Change from Baseline+4.0'));
+    assert.ok(!text(progress).includes('Change from Baseline'));
+    assert.ok(text(progress).includes('Independent Assessment'));
+    assert.ok(text(progress).includes('Latest Assessment 5.0 / 5'));
+    let historyOpened=false;
+    const linkedProgress=harness.render(Progress,{
+      completed:JSON.parse(localStorage.getItem('tb-completed')),assessments,
+      onAssessmentHistory:()=>{historyOpened=true;},
+    });
+    button(linkedProgress,'View Assessment History').props.onClick();
+    assert.equal(historyOpened,true);
+    const {default:AssessmentHistory}=await componentModule('src/AssessmentHistory.jsx');
+    const history=AssessmentHistory({assessments});
+    assert.ok(text(history).includes('Change from Baseline+4.0'));
+    assert.equal(nodes(history).filter(node=>node.type==='tbody')[0].props.children.length,2);
+    const pendingDraft={id:'unfinished',bankVersion:assessmentBankVersion,index:1,submitted:false,items:assessmentForms[2].map(q=>({...q,answer:'Partial answer',scores:null}))};
+    localStorage.setItem('tb-assessment-draft',JSON.stringify(pendingDraft));
+    const draftBefore=localStorage.getItem('tb-assessment-draft');
+    const historyHarness=hooks();globalThis.__testReact=historyHarness.react;
+    const {default:HistoryAssessment}=await componentModule('src/Assessment.jsx');
+    const historyPage=historyHarness.render(HistoryAssessment,{...props,assessments,showHistory:true});
+    assert.ok(text(historyPage).includes('Your Translation Level'));
+    assert.ok(nodes(historyPage).some(node=>node.type?.name==='AssessmentHistory'));
+    assert.equal(localStorage.getItem('tb-assessment-draft'),draftBefore);
+    button(historyPage,'Resume Assessment').props.onClick();
+    const resumed=historyHarness.render(HistoryAssessment,{...props,assessments,showHistory:true});
+    assert.ok(text(resumed).includes('Sentence 2 of 5'));
+    assert.equal(nodes(resumed).find(node=>node.props?.id==='assessment-answer').props.value,'Partial answer');
+    assert.equal(localStorage.getItem('tb-assessment-draft'),draftBefore);
+    historyHarness.cleanup();
     assert.ok(text(progress).includes('Revisions Completed1'));
   } finally {
     globalThis.fetch=originalFetch;
