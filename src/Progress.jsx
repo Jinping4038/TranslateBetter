@@ -9,7 +9,7 @@ const skills = [
 ];
 const scoreText = value => value === null ? '—' : value.toFixed(1);
 
-export default function Progress({completed: activity, assessments = [], onAssessmentHistory}) {
+export default function Progress({completed: activity}) {
   const [category, setCategory] = useState('overall');
   const progress = practiceProgress(activity,category);
   const {average,days} = progress;
@@ -38,9 +38,6 @@ export default function Progress({completed: activity, assessments = [], onAsses
     ['Average Practice Score', average === null ? '—' : scoreText(average) + ' / 5', ChartNoAxesColumnIncreasing, 'pink'],
     ['Revisions Completed', progress.revisionsCompleted, Pencil, 'purple'],
   ];
-  const assessmentHistory = [...assessments].sort((a,b)=>new Date(a.date)-new Date(b.date));
-  const baselineAssessment = assessmentHistory[0];
-  const latestAssessment = assessmentHistory.at(-1);
   return <main className="utility progress-page">
     <h1>Your Progress</h1>
     <p className="muted">Practice scores reflect learning with hints and AI feedback. Assessment scores measure independent translation before feedback.</p>
@@ -74,15 +71,6 @@ export default function Progress({completed: activity, assessments = [], onAsses
         <article><ChartNoAxesColumnIncreasing size={23}/><div><strong>Daily trend</strong><p>{change===null?'Practice on another day to compare scores.':`Your ${category==='overall'?'overall':'selected skill'} average ${change===0?'held steady':`${change>0?'rose':'fell'} by ${Math.abs(change).toFixed(1)} points`} between ${points[0].label} and ${points.at(-1).label}.`}</p></div></article>
         <article><Target size={23}/><div><strong>Focus Area</strong><p>{focus?`${focus.label} has your lowest average score (${scoreText(focus.value)} / 5). Review your feedback in this area as you practice.`:'Complete a scored translation to see which skill to focus on.'}</p></div></article>
       </div>
-    </section>
-    <section className="progress-panel assessment-summary-card">
-      <h2>Independent Assessment</h2>
-      <p className="muted">Scores from independent translation completed before feedback.</p>
-      {latestAssessment?<div className="assessment-summary-values">
-        <p>Latest Assessment <strong>{latestAssessment.overall.toFixed(1)} / 5</strong></p>
-        <p>Baseline Assessment <strong>{baselineAssessment.overall.toFixed(1)} / 5</strong></p>
-      </div>:<p>Complete your first assessment to establish a baseline.</p>}
-      <button type="button" className="secondary" onClick={onAssessmentHistory}>View Assessment History</button>
     </section>
   </main>;
 }

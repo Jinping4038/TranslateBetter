@@ -198,15 +198,8 @@ test('Milestone 3 regression flows with isolated storage and mocked AI',async()=
     assert.ok(text(progress).includes('Practice Sessions1'));
     assert.ok(!text(progress).includes('Sentences Practiced'));
     assert.ok(!text(progress).includes('Difference from Baseline'));
-    assert.ok(text(progress).includes('Independent Assessment'));
-    assert.ok(text(progress).includes('Latest Assessment 5.0 / 5'));
-    let historyOpened=false;
-    const linkedProgress=harness.render(Progress,{
-      completed:JSON.parse(localStorage.getItem('tb-completed')),assessments,
-      onAssessmentHistory:()=>{historyOpened=true;},
-    });
-    button(linkedProgress,'View Assessment History').props.onClick();
-    assert.equal(historyOpened,true);
+    assert.ok(!text(progress).includes('Independent Assessment'));
+    assert.ok(!text(progress).includes('View Assessment History'));
     const {default:AssessmentHistory}=await componentModule('src/AssessmentHistory.jsx');
     const history=AssessmentHistory({assessments});
     assert.ok(text(history).includes('Difference from Baseline+4.0'));
