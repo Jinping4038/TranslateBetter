@@ -15,3 +15,11 @@ The active practice/revision/comparison draft is stored in sessionStorage for it
 Record updates read the latest stored data and use the Web Locks API when supported to serialize writes across tabs. Browsers without Web Locks use a fresh-read fallback and may still have simultaneous-write races.
 
 Run the targeted regression checks with `node --test tests/milestone3.test.mjs`. They use mocked AI responses and isolated storage. Live AI availability and browser rendering require a separate manual check.
+
+## Practice sentence preferences
+
+Settings → Practice Preferences controls only normal Practice. Both preferences default on and are saved in localStorage. Existing practice attempts (including revisions) establish whether a sentence has been practiced; its most recent valid scores determine review priority. An overall average below 4 or any category below 4 qualifies for lower-score review. Legacy records without valid scores still count as previously practiced but do not receive score-based priority.
+
+With both preferences on, automatic selection normally chooses an unpracticed sentence, with a 25% chance to revisit an eligible lower-scoring one. Once new sentences run out, completed sentences remain available. Turning off new-sentence priority allows the full bank; turning off lower-score review removes that extra weighting. The last five displayed sentences are excluded, with a smaller-bank fallback. Previous/Next retraces the current tab's viewing sequence before selecting another sentence. The sequence survives refresh in sessionStorage. My Sentences → Practice Again directly opens the selected saved sentence. Assessment uses its own unchanged bank and selection rules.
+
+Selection checks: `node --test tests/practice-selection.test.mjs tests/milestone3.test.mjs`.

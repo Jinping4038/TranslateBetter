@@ -266,6 +266,54 @@ test('Milestone 3 regression flows with isolated storage and mocked AI',async()=
     assert.equal(localStorage.getItem('tb-assessment-draft'),draftBefore);
     historyHarness.cleanup();
     assert.ok(text(progress).includes('Revisions Completed1'));
+
+    // Practice selection navigation and preferences persist without touching saved history.
+    const preservedSaved=localStorage.getItem('tb-saved');
+    const preservedAssessments=localStorage.getItem('tb-assessments');
+    sessionStorage.setItem('tb-active-practice','null');
+    const selectionHarness=hooks();globalThis.__testReact=selectionHarness.react;
+    const {default:SelectionApp}=await componentModule('src/main.jsx',true);
+    let selection=selectionHarness.render(SelectionApp);
+    button(selection,'Start practicing').props.onClick();
+    selection=selectionHarness.render(SelectionApp);
+    const firstSource=text(nodes(selection).find(node=>node.props?.className==='sentence'));
+    button(selection,'Next sentence').props.onClick();
+    selection=selectionHarness.render(SelectionApp);
+    const nextSource=text(nodes(selection).find(node=>node.props?.className==='sentence'));
+    assert.notEqual(firstSource,nextSource);
+    button(selection,'Previous sentence').props.onClick();
+    selection=selectionHarness.render(SelectionApp);
+    assert.equal(text(nodes(selection).find(node=>node.props?.className==='sentence')),firstSource);
+    button(selection,'Next sentence').props.onClick();
+    selection=selectionHarness.render(SelectionApp);
+    assert.equal(text(nodes(selection).find(node=>node.props?.className==='sentence')),nextSource);
+    button(selection,'Settings').props.onClick();
+    selection=selectionHarness.render(SelectionApp);
+    const preferences=nodes(selection).find(node=>node.type?.name==='PracticePreferences');
+    assert.equal(preferences.props.preferences.prioritizeUnseen,true);
+    preferences.props.onChange('prioritizeUnseen',false);
+    selection=selectionHarness.render(SelectionApp);
+    assert.equal(JSON.parse(localStorage.getItem('tb-practice-preferences')).prioritizeUnseen,false);
+    assert.equal(localStorage.getItem('tb-saved'),preservedSaved);
+    assert.equal(localStorage.getItem('tb-assessments'),preservedAssessments);
+    const pathBefore=readPracticeSession().practiceTrail;
+    selectionHarness.cleanup();
+    const refreshedSelection=hooks();globalThis.__testReact=refreshedSelection.react;
+    const {default:RefreshedSelectionApp}=await componentModule('src/main.jsx',true);
+    selection=refreshedSelection.render(RefreshedSelectionApp);
+    assert.equal(nodes(selection).find(node=>node.type?.name==='PracticePreferences').props.preferences.prioritizeUnseen,false);
+    assert.deepEqual(readPracticeSession().practiceTrail,pathBefore);
+    button(selection,'Practice').props.onClick();
+    selection=refreshedSelection.render(RefreshedSelectionApp);
+    assert.equal(text(nodes(selection).find(node=>node.props?.className==='sentence')),nextSource);
+    button(selection,'My Sentences').props.onClick();
+    selection=refreshedSelection.render(RefreshedSelectionApp);
+    button(selection,'Practice Again').props.onClick();
+    selection=refreshedSelection.render(RefreshedSelectionApp);
+    assert.ok(text(nodes(selection).find(node=>node.props?.className==='sentence')).includes(JSON.parse(preservedSaved)[0].zh));
+    assert.equal(localStorage.getItem('tb-saved'),preservedSaved);
+    refreshedSelection.cleanup();
+
   } finally {
     globalThis.fetch=originalFetch;
   }

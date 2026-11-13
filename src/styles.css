@@ -132,3 +132,15 @@
 @media(max-width:480px){.assessment-banner-art{display:none}}
 
 .assessment-record-content h4{font-size:12px;line-height:1.5;margin:16px 0 8px}
+
+.practice-preferences h2{font-size:20px;margin:0 0 8px}
+.practice-preferences>p{margin:0 0 20px}
+.practice-preference{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:20px 0;border-top:1px solid var(--line)}
+.practice-preference:last-child{padding-bottom:0}
+.practice-preference label{margin:0 0 6px;cursor:pointer}
+.practice-preference p{margin:0;font-size:12px}
+.practice-preference input{appearance:none;width:42px;height:24px;background:#cbd5e4;border-radius:20px;flex-shrink:0;cursor:pointer;position:relative;transition:background .18s}
+.practice-preference input:checked{background:var(--blue)}
+.practice-preference input:after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .18s}
+.practice-preference input:checked:after{transform:translateX(18px)}
+.practice-preference input:focus-visible{outline:3px solid #9bc2ff;outline-offset:4px}

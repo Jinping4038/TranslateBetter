@@ -4,6 +4,8 @@ import {BookOpen, Pencil, Bookmark, ChartNoAxesColumnIncreasing, Settings, Light
 import './styles.css';
 import exercises from './exercises.js';
 import Progress from './Progress.jsx';
+import PracticePreferences from './PracticePreferences.jsx';
+import {practicePreferencesKey, normalizePracticePreferences, selectPracticeSentence} from './practice-selection.js';
 import Assessment from './Assessment.jsx';
 import {validatedPracticeScores, validPracticeAttempt, validScore, readPracticeSession} from './practice-data.js';
 import {appendRecord, updateRecords, readRecords} from './storage.js';
@@ -31,12 +33,26 @@ function FeedbackCards({feedback}){
 }
 function App(){
 const [restored]=useState(readPracticeSession);
-const [page,setPage]=useState(restored?.page||'home'),[index,setIndex]=useState(restored?.index<exercises.length?restored.index:0),[translation,setTranslation]=useState(restored?.translation||''),[hint,setHint]=useState(restored?.hint||0),[saved,setSaved]=useState(()=>read('tb-saved',[])),[completed,setCompleted]=useState(()=>read('tb-completed',[])),[toast,setToast]=useState(''),[difficulty,setDifficulty]=useState(()=>read('tb-level','Intermediate'));
+const [page,setPage]=useState(restored?.page||'home'),[index,setIndex]=useState(()=>restored?.index<exercises.length?restored.index:selectPracticeSentence(exercises,read('tb-completed',[]),read(practicePreferencesKey,null))),[translation,setTranslation]=useState(restored?.translation||''),[hint,setHint]=useState(restored?.hint||0),[saved,setSaved]=useState(()=>read('tb-saved',[])),[completed,setCompleted]=useState(()=>read('tb-completed',[])),[toast,setToast]=useState(''),[difficulty,setDifficulty]=useState(()=>read('tb-level','Intermediate'));
 const [showAnswer,setShowAnswer]=useState(restored?.showAnswer||false),[showFeedback,setShowFeedback]=useState(restored?.showFeedback||false);
 const [feedback,setFeedback]=useState(restored?.feedback||null),[feedbackError,setFeedbackError]=useState(''),[loading,setLoading]=useState(false);
 const [revision,setRevision]=useState(restored?.revision||'');
 const [selectedRevision,setSelectedRevision]=useState(restored?.selectedRevision??null);
 const [versions,setVersions]=useState(restored?.versions||[]),[selectedSentence,setSelectedSentence]=useState(null);
+const [preferences,setPreferences]=useState(()=>normalizePracticePreferences(read(practicePreferencesKey,null)));
+const [practiceTrail,setPracticeTrail]=useState(()=>{
+  const trail=restored?.practiceTrail;
+  return Array.isArray(trail)&&trail.length&&trail.every(i=>Number.isInteger(i)&&i>=0&&i<exercises.length)&&
+    Number.isInteger(restored?.practicePosition)&&trail[restored.practicePosition]===index?trail:[index];
+});
+const [practicePosition,setPracticePosition]=useState(()=>practiceTrail[restored?.practicePosition]===index?restored.practicePosition:0);
+function changePreference(key,value){
+  try {
+    const next={...normalizePracticePreferences(read(practicePreferencesKey,null)),[key]:value};
+    localStorage.setItem(practicePreferencesKey,JSON.stringify(next));
+    setPreferences(next);
+  } catch {notify('Could not save practice preferences. Please check browser storage.');}
+}
 const [assessments,setAssessments]=useState(()=>read('tb-assessments',[]));
 async function completeAssessment(result){
   setAssessments(await appendRecord('tb-assessments',result));
@@ -45,13 +61,14 @@ useEffect(()=>{
   try {
     sessionStorage.setItem('tb-active-practice',JSON.stringify({
       page:page==='saved-detail'?'saved':page,index,translation,hint,showAnswer,showFeedback,
-      feedback,revision,selectedRevision,versions,
+      feedback,revision,selectedRevision,versions,practiceTrail,practicePosition,
     }));
   } catch { /* Completed records remain in localStorage if tab-draft storage is unavailable. */ }
-},[page,index,translation,hint,showAnswer,showFeedback,feedback,revision,selectedRevision,versions]);
+},[page,index,translation,hint,showAnswer,showFeedback,feedback,revision,selectedRevision,versions,practiceTrail,practicePosition]);
 useEffect(()=>{
   function syncRecords(event){
     try {
+      if(event.key===practicePreferencesKey)setPreferences(normalizePracticePreferences(read(practicePreferencesKey,null)));
       if(event.key==='tb-completed')setCompleted(readRecords(event.key));
       if(event.key==='tb-assessments')setAssessments(readRecords(event.key));
       if(event.key==='tb-saved')setSaved(readRecords(event.key));
@@ -63,7 +80,7 @@ useEffect(()=>{
 const activeRequest=useRef(null);
 function clearFeedback(){setSelectedRevision(null);setVersions([]);activeRequest.current?.abort();activeRequest.current=null;setLoading(false);setShowFeedback(false);setFeedback(null);setFeedbackError('');}
 const ex=exercises[index];
-const hasNextSentence=index+1<exercises.length;
+const hasNextSentence=exercises.length>1;
 const todayCount=new Set(completed.filter(validPracticeAttempt).filter(item=>new Date(item.date).toDateString()===new Date().toDateString()).map(item=>item.zh)).size;
 function notify(message){setToast(message);setTimeout(()=>setToast(''),2500)}
 async function submit(e){
@@ -115,7 +132,23 @@ function goToSentence(nextIndex){
   setShowAnswer(false);
   setPage('practice');
 }
-function next(){goToSentence(index+1)}
+function next(){
+  if(practicePosition+1<practiceTrail.length){
+    setPracticePosition(practicePosition+1);
+    goToSentence(practiceTrail[practicePosition+1]);
+    return;
+  }
+  const nextIndex=selectPracticeSentence(exercises,completed,preferences,practiceTrail.slice(0,practicePosition+1));
+  if(nextIndex===null)return;
+  setPracticeTrail([...practiceTrail.slice(0,practicePosition+1),nextIndex]);
+  setPracticePosition(practicePosition+1);
+  goToSentence(nextIndex);
+}
+function previous(){
+  if(practicePosition===0)return;
+  setPracticePosition(practicePosition-1);
+  goToSentence(practiceTrail[practicePosition-1]);
+}
 function reviseTranslation(){
   setHint(0);
   setRevision(translation);
@@ -160,6 +193,8 @@ function practiceSaved(sentence){
   const exerciseIndex=exercises.findIndex(item=>item.zh===sentence.zh);
   if(exerciseIndex<0)return;
   clearFeedback();
+  setPracticeTrail([...practiceTrail.slice(0,practicePosition+1),exerciseIndex]);
+  setPracticePosition(practicePosition+1);
   setIndex(exerciseIndex);
   setTranslation('');
   setHint(0);
@@ -247,19 +282,19 @@ return <div className="app"><header><button className="brand" onClick={()=>setPa
   </div>
   <button type="button" className="icon-button" aria-label="Close hints" onClick={()=>setHint(0)}><X size={15}/></button>
 </div>}<div className="practice-actions inline-actions"><button type="button" className="secondary" disabled={!translation.trim()} onClick={()=>setShowAnswer(!showAnswer)} aria-expanded={showAnswer} aria-controls="reference-answer"><BookOpen size={17}/>{showAnswer?'Hide the answer':'See the answer'}</button><button className="primary" disabled={!translation.trim()||loading} aria-controls="practice-feedback"><Sparkles size={17}/>{loading?'Getting feedback…':'Get AI feedback'}</button></div><div className="practice-tools"><button className="hint-button" type="button" aria-expanded={hint>0} onClick={()=>setHint(hint?0:1)}><Lightbulb size={16}/>Need a hint?</button><button type="button" className="text-button" onClick={()=>{clearFeedback();setTranslation('');setHint(0);setShowAnswer(false);setShowFeedback(false)}}><RotateCcw size={15}/>Reset</button><div className="sentence-navigation">
-  {index>0&&<button type="button" className="text-button" onClick={()=>goToSentence(index-1)}>Previous sentence</button>}
+  {practicePosition>0&&<button type="button" className="text-button" onClick={previous}>Previous sentence</button>}
     {hasNextSentence&&<button type="button" className="text-button" onClick={next}>Next sentence<ArrowRight size={15}/></button>}
 </div></div></form>{referenceAnswer}{showFeedback&&<section id="practice-feedback" className="feedback inline-result" aria-label="Practice feedback" aria-live="polite"><div className="feedback-heading"><h3><Sparkles size={19}/>AI feedback</h3></div>{loading&&<p role="status">Reviewing your translation…</p>}{feedbackError&&<p role="alert" className="feedback-error">{feedbackError}</p>}{feedback&&<><FeedbackCards feedback={feedback}/><div className="feedback-actions">
   {hasRevisions&&<button type="button" className="secondary" onClick={()=>setPage('comparison')}>View Comparison</button>}
   <button type="button" className="primary" onClick={reviseTranslation}><Pencil size={17}/>{hasRevisions?'Revise Again':'Revise Translation'}</button>
 </div></>}<p className="demo-note">Your translation is sent to Groq for review. AI feedback may contain mistakes.</p></section>}<div className="practice-footnote"><span className="status-dot"/>Keep editing your translation above and request feedback again whenever you’re ready.</div></main></>:
-page==='progress'?<Progress completed={completed} assessments={assessments} onAssessmentHistory={()=>setPage('assessment-history')}/>:<main className="utility"><span className="eyebrow">YOUR LEARNING SPACE</span><h1>{page==='saved'?'My Sentences':page==='progress'?'A little better, every day.':'Make practice your own.'}</h1><p className="muted">{page==='saved'?'Revisit useful expressions and let them become second nature.':page==='progress'?'Every sentence is another step toward confidence.':'Choose your preferred practice level.'}</p>{page==='saved'?saved.length?saved.map(s=><article className="saved-card" key={s.zh}><BookOpen size={22}/><button type="button" className="saved-history-link" onClick={()=>{setSelectedSentence(s);setPage('saved-detail')}}>
+page==='progress'?<Progress completed={completed} assessments={assessments} onAssessmentHistory={()=>setPage('assessment-history')}/>:<main className="utility"><span className="eyebrow">YOUR LEARNING SPACE</span><h1>{page==='saved'?'My Sentences':page==='progress'?'A little better, every day.':'Make practice your own.'}</h1><p className="muted">{page==='saved'?'Revisit useful expressions and let them become second nature.':page==='progress'?'Every sentence is another step toward confidence.':'Choose your practice preferences.'}</p>{page==='saved'?saved.length?saved.map(s=><article className="saved-card" key={s.zh}><BookOpen size={22}/><button type="button" className="saved-history-link" onClick={()=>{setSelectedSentence(s);setPage('saved-detail')}}>
   <span><strong>{s.zh}</strong><small>View translation history</small>
   {savedHistory(s).at(-1)?.scores&&<span className="history-scores">{scoreCategories.map(([key,label])=>{
     const history=savedHistory(s);
     const first=history[0].scores?.[key],last=history.at(-1).scores?.[key];
     return <span key={key}>{label} {Number.isInteger(first)&&first!==last?`${formatScore(first)} → `:''}{formatScore(last)}</span>;
   })}</span>}</span>
-</button><button type="button" className="secondary saved-practice" onClick={()=>practiceSaved(s)}>Practice Again</button><button className="icon-button" aria-label="Remove saved sentence" onClick={()=>removeSavedSentence(s)}><Trash2 size={17}/></button></article>):<div className="empty"><Bookmark size={35}/><h3>Your collection starts with one sentence.</h3><p>Save a reference answer after completing an exercise.</p><button className="primary" onClick={()=>setPage('practice')}>Start practicing <ArrowRight size={17}/></button></div>:page==='progress'?<><div className="stats">{[[completed.length,'Translations submitted'],[saved.length,'Sentences saved'],[`${Math.min(todayCount,10)}/10`,'Daily goal']].map(([number,label])=><article key={label}><strong>{number}</strong><span>{label}</span></article>)}</div><h3>Recent practice</h3>{completed.length?completed.slice(-5).reverse().map((item,i)=><article className="saved-card" key={i}><Check size={20}/><div><h3>{item.zh}</h3><p>{item.text}</p></div></article>):<p className="empty">Your first practice session is waiting for you.</p>}</>:<div className="settings-card"><label htmlFor="level">Practice level</label><select id="level" value={difficulty} onChange={e=>{setDifficulty(e.target.value);localStorage.setItem('tb-level',JSON.stringify(e.target.value))}}>{['Beginner','Intermediate','Advanced'].map(v=><option key={v}>{v}</option>)}</select><p className="muted">This preference labels your session. The collection includes 100 intermediate Chinese-to-English exercises.</p></div>}</main>}
+</button><button type="button" className="secondary saved-practice" onClick={()=>practiceSaved(s)}>Practice Again</button><button className="icon-button" aria-label="Remove saved sentence" onClick={()=>removeSavedSentence(s)}><Trash2 size={17}/></button></article>):<div className="empty"><Bookmark size={35}/><h3>Your collection starts with one sentence.</h3><p>Save a reference answer after completing an exercise.</p><button className="primary" onClick={()=>setPage('practice')}>Start practicing <ArrowRight size={17}/></button></div>:page==='progress'?<><div className="stats">{[[completed.length,'Translations submitted'],[saved.length,'Sentences saved'],[`${Math.min(todayCount,10)}/10`,'Daily goal']].map(([number,label])=><article key={label}><strong>{number}</strong><span>{label}</span></article>)}</div><h3>Recent practice</h3>{completed.length?completed.slice(-5).reverse().map((item,i)=><article className="saved-card" key={i}><Check size={20}/><div><h3>{item.zh}</h3><p>{item.text}</p></div></article>):<p className="empty">Your first practice session is waiting for you.</p>}</>:<><div className="settings-card"><label htmlFor="level">Practice level</label><select id="level" value={difficulty} onChange={e=>{setDifficulty(e.target.value);localStorage.setItem('tb-level',JSON.stringify(e.target.value))}}>{['Beginner','Intermediate','Advanced'].map(v=><option key={v}>{v}</option>)}</select><p className="muted">This preference labels your session. The collection includes 100 intermediate Chinese-to-English exercises.</p></div><PracticePreferences preferences={preferences} onChange={changePreference}/></>}</main>}
 </div>}{toast&&<div className="toast" role="status"><Check size={17}/>{toast}</div>}</div>}
 createRoot(document.getElementById('root')).render(<App/>);
