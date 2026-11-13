@@ -1,7 +1,7 @@
 import AssessmentHistory from './AssessmentHistory.jsx';
 import React, {useEffect, useRef, useState} from 'react';
 import {assessmentBankVersion, assessmentForms, selectAssessmentForm} from './assessment-exercises.js';
-import {assessmentSkills, validAssessmentScores, summarizeAssessment, assessmentStrengths} from './assessment-data.js';
+import {validAssessmentScores, summarizeAssessment} from './assessment-data.js';
 
 const draftKey = 'tb-assessment-draft';
 function loadDraft() {
@@ -109,35 +109,23 @@ export default function Assessment({assessments, onComplete, onPractice, onProgr
     }
   }
 
-  if (result) return <main className="utility assessment-page">
-    <h1>Your Translation Level</h1>
-    <p className="muted">Independent assessment · {new Date(result.date).toLocaleString()}</p>
-    <section className="progress-panel assessment-overall"><span>Overall Score</span><strong>{result.overall.toFixed(1)} / 5</strong></section>
-    <h2>Skill Breakdown</h2>
-    <div className="progress-stats">{assessmentSkills.map(([key,label]) => <section className="progress-panel" key={key}>
-      <h3>{label}</h3><strong>{result.skills[key].toFixed(1)} / 5</strong>
-    </section>)}</div>
-    <p className="assessment-summary">{assessmentStrengths(result.skills)}</p>
-    <p className="muted">{assessments[0]?.id === result.id ? 'This assessment establishes your baseline. Take another after more practice to compare results.' : 'Compare this assessment with your baseline in the history below.'}</p>
-    <div className="revision-actions">
-      <button className="primary" onClick={onPractice}>Start Practicing</button>
-      <button className="secondary" onClick={onProgress}>View Progress</button>
-      <button className="secondary" onClick={()=>{
-        if(draft&&!assessments.some(item=>item.id===draft.id)){setResult(null);setError('');}
-        else start();
-      }}>{draft&&!assessments.some(item=>item.id===draft.id)?'Resume Assessment':'Take Another Assessment'}</button>
-    </div>
-    <AssessmentHistory assessments={assessments}/>
-    {error && <p className="feedback-error" role="alert">{error}</p>}
-  </main>;
-
-  if (!draft) return <main className="utility assessment-page">
-    <h1>Assessment</h1>
-    <p>Translate five sentences independently to measure your current performance.</p>
-    <section className="progress-panel">
-      <p>Write each answer on your own. Scores appear after you submit all five sentences.</p>
-      <p>Your first result establishes a baseline. Later assessments use rotated sentences so you can compare your performance over time.</p>
-      <button className="primary" onClick={start}>Start Assessment</button>
+  if (result || !draft) return <main className="utility assessment-page">
+    <section className="assessment-banner">
+      <div className="assessment-banner-copy">
+        <h1>Check Your Translation Level</h1>
+        <p>Take a short assessment to see your current strengths in meaning, grammar, and naturalness. It’s independent, with no hints or AI feedback.</p>
+        <button className="primary" onClick={()=>{
+          if(draft&&!assessments.some(item=>item.id===draft.id)){setResult(null);setError('');}
+          else start();
+        }}>{draft&&!assessments.some(item=>item.id===draft.id)?'Resume Assessment':assessments.length?'Take Another Assessment':'Start Assessment'} <span aria-hidden="true">→</span></button>
+      </div>
+      <svg className="assessment-banner-art" viewBox="0 0 180 180" fill="none" aria-hidden="true">
+        <rect x="37" y="30" width="112" height="137" rx="16" fill="#e4dcff"/>
+        <rect x="29" y="22" width="112" height="137" rx="16" fill="white" stroke="#a58ae9" strokeWidth="5"/>
+        <rect x="62" y="12" width="49" height="23" rx="8" fill="#a58ae9"/>
+        <path d="m48 59 6 6 11-14m-17 39 6 6 11-14m-17 39 6 6 11-14" stroke="#9977e3" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M80 59h41M80 90h41M80 121h29" stroke="#e4dcff" strokeWidth="7" strokeLinecap="round"/>
+      </svg>
     </section>
     <AssessmentHistory assessments={assessments}/>
     {error && <p className="feedback-error" role="alert">{error}</p>}

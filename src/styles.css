@@ -116,3 +116,17 @@
 .assessment-summary-values{display:flex;flex-wrap:wrap;gap:12px 30px}
 .assessment-summary-values strong{margin-inline-start:8px}
 .assessment-page .assessment-progress-section{margin-top:28px}
+
+.assessment-banner{display:flex;align-items:center;gap:24px;padding:32px;border:1px solid #e8dfff;border-radius:14px;background:linear-gradient(115deg,#f6f3ff,#edf3ff);overflow:hidden}
+.assessment-banner-copy{flex:1;min-width:0}
+.assessment-banner .assessment-banner-copy h1{font-size:28px;letter-spacing:-.8px;margin:0 0 14px}
+.assessment-banner p{font-size:14px;color:#52607a;max-width:620px;margin-bottom:22px}
+.assessment-banner-art{width:155px;flex-shrink:0;transform:rotate(5deg)}
+.assessment-action-label{font-size:12px}
+.assessment-record-details summary{cursor:pointer;color:#185cc0;font-size:12px;font-weight:650;white-space:nowrap;border-radius:6px;padding:6px}
+.assessment-record-details summary:focus-visible{outline:3px solid #9bc2ff;outline-offset:3px}
+.assessment-record-content{min-width:230px;max-width:310px;padding:16px;margin-top:12px;background:#f6f7ff;border:1px solid #e7e4f5;border-radius:10px;white-space:normal;text-align:left}
+.assessment-record-content p{font-size:12px;margin-bottom:8px}
+.assessment-page .assessment-progress-section h2{margin-top:0}
+@media(max-width:760px){.assessment-banner{padding:24px;gap:12px}.assessment-banner .assessment-banner-copy h1{font-size:24px}.assessment-banner-art{width:90px}.assessment-banner p{font-size:13px}}
+@media(max-width:480px){.assessment-banner-art{display:none}}
