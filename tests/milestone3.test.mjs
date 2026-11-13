@@ -6,6 +6,7 @@ import {build} from 'esbuild';
 import {validatedPracticeScores, validPracticeAttempt, readPracticeSession} from '../src/practice-data.js';
 import {appendRecord} from '../src/storage.js';
 import {appendVersions} from '../src/revision-history.js';
+import {practiceProgress} from '../src/progress-data.js';
 import {summarizeAssessment} from '../src/assessment-data.js';
 import {assessmentForms, assessmentBankVersion} from '../src/assessment-exercises.js';
 
@@ -194,7 +195,7 @@ test('Milestone 3 regression flows with isolated storage and mocked AI',async()=
     const {default:Progress}=await componentModule('src/Progress.jsx');
     const progress=harness.render(Progress,{completed:JSON.parse(localStorage.getItem('tb-completed')),assessments});
     assert.ok(text(progress).includes('Average Practice Score4.0 / 5'));
-    assert.ok(text(progress).includes('Practice Attempts1'));
+    assert.ok(text(progress).includes('Practice Sessions1'));
     assert.ok(!text(progress).includes('Sentences Practiced'));
     assert.ok(!text(progress).includes('Difference from Baseline'));
     assert.ok(text(progress).includes('Independent Assessment'));
@@ -333,6 +334,24 @@ test('Milestone 3 regression flows with isolated storage and mocked AI',async()=
     selection=refreshedSelection.render(RefreshedSelectionApp);
     assert.ok(text(nodes(selection).find(node=>node.props?.className==='sentence')).includes(JSON.parse(preservedSaved)[0].zh));
     assert.equal(localStorage.getItem('tb-saved'),preservedSaved);
+    assert.equal(nodes(selection).find(node=>node.props?.id==='translation').props.value,'');
+    const beforeReplay=practiceProgress(JSON.parse(localStorage.getItem('tb-completed')));
+    nodes(selection).find(node=>node.props?.id==='translation').props.onChange({target:{value:'A fresh translation after Practice Again.'}});
+    selection=refreshedSelection.render(RefreshedSelectionApp);
+    await nodes(selection).find(node=>node.type==='form').props.onSubmit(event);
+    selection=refreshedSelection.render(RefreshedSelectionApp);
+    const afterReplay=practiceProgress(JSON.parse(localStorage.getItem('tb-completed')));
+    assert.equal(afterReplay.practiceSessions,beforeReplay.practiceSessions+1);
+    assert.equal(afterReplay.revisionsCompleted,beforeReplay.revisionsCompleted);
+    button(selection,'Revise Translation').props.onClick();
+    selection=refreshedSelection.render(RefreshedSelectionApp);
+    nodes(selection).find(node=>node.props?.id==='revision').props.onChange({target:{value:'A revised translation after Practice Again.'}});
+    selection=refreshedSelection.render(RefreshedSelectionApp);
+    await nodes(selection).find(node=>node.type==='form').props.onSubmit(event);
+    selection=refreshedSelection.render(RefreshedSelectionApp);
+    const afterRevision=practiceProgress(JSON.parse(localStorage.getItem('tb-completed')));
+    assert.equal(afterRevision.practiceSessions,afterReplay.practiceSessions);
+    assert.equal(afterRevision.revisionsCompleted,afterReplay.revisionsCompleted+1);
     refreshedSelection.cleanup();
 
   } finally {

@@ -13,7 +13,7 @@ test('Daily trend contains all actual completion dates, averages same-day attemp
   assert.deepEqual(progress.days.map(day=>day.key),['2026-01-01','2026-11-09','2026-11-11','2026-11-12']);
   assert.deepEqual(progress.days.map(day=>day.value),[3,4,3,3.5]);
   assert.equal(progress.days.at(-1).count,2);
-  assert.equal(progress.practiceAttempts,5);
+  assert.equal(progress.practiceSessions,5);
   assert.equal(progress.average,3.4);
   assert.equal(progress.days.reduce((sum,day)=>sum+day.value*day.count,0)/progress.attempts.length,progress.average);
   assert.equal(JSON.stringify(data),before);
@@ -34,7 +34,7 @@ test('Revisions and assessments never inflate independent practice metrics or cr
   const progress=practiceProgress(data);
   assert.equal(progress.average,3);
   assert.deepEqual(progress.breakdown,{meaning:3,grammar:3,naturalness:3});
-  assert.equal(progress.practiceAttempts,1);
+  assert.equal(progress.practiceSessions,1);
   assert.equal(progress.revisionsCompleted,1);
   assert.deepEqual(progress.days.map(day=>day.key),['2026-11-09']);
   assert.deepEqual(practiceProgress([]).days,[]);
@@ -58,7 +58,7 @@ test('Local calendar days handle UTC boundaries, DST, calendar-only legacy dates
   }
 });
 
-test('Practice Attempts counts repeated sentences across all dates with the same records used for average and trend',()=>{
+test('Practice Sessions counts repeated sentences across all dates with the same records used for average and trend',()=>{
   const data=[
     record('one','2026-11-05',[5,5,5],{zh:'Same sentence'}),
     record('two','2026-11-05',[3,3,3],{zh:'Same sentence'}),
@@ -68,13 +68,13 @@ test('Practice Attempts counts repeated sentences across all dates with the same
   ];
   const before=JSON.stringify(data);
   const progress=practiceProgress(data);
-  assert.equal(progress.practiceAttempts,3);
+  assert.equal(progress.practiceSessions,3);
   assert.equal(progress.average,3);
   assert.deepEqual(progress.days.map(day=>[day.key,day.value,day.count]),[
     ['2026-11-05',4,2],['2026-11-12',1,1],
   ]);
-  assert.equal(progress.days.reduce((sum,day)=>sum+day.count,0),progress.practiceAttempts);
+  assert.equal(progress.days.reduce((sum,day)=>sum+day.count,0),progress.practiceSessions);
   assert.equal(progress.revisionsCompleted,1);
-  assert.equal(practiceProgress([]).practiceAttempts,0);
+  assert.equal(practiceProgress([]).practiceSessions,0);
   assert.equal(JSON.stringify(data),before);
 });
