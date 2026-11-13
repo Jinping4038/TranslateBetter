@@ -194,6 +194,8 @@ test('Milestone 3 regression flows with isolated storage and mocked AI',async()=
     const {default:Progress}=await componentModule('src/Progress.jsx');
     const progress=harness.render(Progress,{completed:JSON.parse(localStorage.getItem('tb-completed')),assessments});
     assert.ok(text(progress).includes('Average Practice Score4.0 / 5'));
+    assert.ok(text(progress).includes('Practice Attempts1'));
+    assert.ok(!text(progress).includes('Sentences Practiced'));
     assert.ok(!text(progress).includes('Difference from Baseline'));
     assert.ok(text(progress).includes('Independent Assessment'));
     assert.ok(text(progress).includes('Latest Assessment 5.0 / 5'));

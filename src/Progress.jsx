@@ -34,7 +34,7 @@ export default function Progress({completed: activity, assessments = [], onAsses
   }));
   const change = points.length > 1 ? points.at(-1).value - points[0].value : null;
   const stats = [
-    ['Sentences Practiced', progress.sentencesPracticed, BookOpen, 'blue'],
+    ['Practice Attempts', progress.practiceAttempts, BookOpen, 'blue'],
     ['Average Practice Score', average === null ? '—' : scoreText(average) + ' / 5', ChartNoAxesColumnIncreasing, 'pink'],
     ['Revisions Completed', progress.revisionsCompleted, Pencil, 'purple'],
   ];

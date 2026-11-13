@@ -31,7 +31,7 @@ export function practiceProgress(activity, category = 'overall') {
   const multipleYears = new Set(days.map(day=>day.date.getFullYear())).size>1;
   return {
     attempts,
-    sentencesPracticed:new Set(attempts.map(attempt=>attempt.zh)).size,
+    practiceAttempts:attempts.length,
     revisionsCompleted:validRecords.filter(record=>record.revision).length,
     average:mean(attempts.map(attempt=>attempt.scores.overall)),
     breakdown:Object.fromEntries(skills.map(key=>[key,mean(attempts.map(attempt=>attempt.scores[key]))])),
