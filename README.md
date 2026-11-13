@@ -23,3 +23,9 @@ Settings → Practice Preferences controls only normal Practice. Both preference
 With both preferences on, automatic selection normally chooses an unpracticed sentence, with a 25% chance to revisit an eligible lower-scoring one. Once new sentences run out, completed sentences remain available. Turning off new-sentence priority allows the full bank; turning off lower-score review removes that extra weighting. The last five displayed sentences are excluded, with a smaller-bank fallback. Previous/Next retraces the current tab's viewing sequence before selecting another sentence. The sequence survives refresh in sessionStorage. My Sentences → Practice Again directly opens the selected saved sentence. Assessment uses its own unchanged bank and selection rules.
 
 Selection checks: `node --test tests/practice-selection.test.mjs tests/milestone3.test.mjs`.
+
+## Progress score trend
+
+Progress derives its average, skill breakdown, insights, and daily chart from the same valid, dated, original Practice attempts. Each local calendar day with completed practice gets one point, averaging all original attempts on that day; no empty dates or weekly buckets are generated. Overall is the average of the three skill scores. Revisions remain saved and counted separately in Revisions Completed; they do not inflate the original-attempt metrics. Assessment records are excluded. Undated or invalid legacy records are preserved in storage, but cannot contribute to these dated metrics.
+
+Progress checks: `node --test tests/*.test.mjs`.

@@ -266,6 +266,25 @@ test('Milestone 3 regression flows with isolated storage and mocked AI',async()=
     assert.equal(localStorage.getItem('tb-assessment-draft'),draftBefore);
     historyHarness.cleanup();
     assert.ok(text(progress).includes('Revisions Completed1'));
+    const datedPractice=[
+      {zh:'First',date:'2026-11-09',scores:{meaning:4,grammar:4,naturalness:4}},
+      {zh:'Recent',date:'2026-11-12',scores:{meaning:5,grammar:3,naturalness:4}},
+      {zh:'Recent revision',date:'2026-11-13',scores:{meaning:5,grammar:5,naturalness:5},revision:true},
+    ];
+    const chartHarness=hooks();globalThis.__testReact=chartHarness.react;
+    const {default:ChartProgress}=await componentModule('src/Progress.jsx');
+    let chartPage=chartHarness.render(ChartProgress,{completed:datedPractice,assessments});
+    let chart=nodes(chartPage).find(node=>node.props?.className==='progress-trend');
+    assert.ok(chart.props['aria-label'].includes('Nov 12 4.0 out of 5'));
+    assert.ok(!chart.props['aria-label'].includes('Nov 13'));
+    nodes(chartPage).find(node=>node.props?.['aria-label']==='Score category').props.onChange({target:{value:'grammar'}});
+    chartPage=chartHarness.render(ChartProgress,{completed:datedPractice,assessments});
+    chart=nodes(chartPage).find(node=>node.props?.className==='progress-trend');
+    assert.ok(chart.props['aria-label'].includes('Nov 12 3.0 out of 5'));
+    assert.ok(text(chartPage).includes('Daily trend'));
+    assert.ok(!text(chartPage).includes('Weekly trend'));
+    chartHarness.cleanup();
+
 
     // Practice selection navigation and preferences persist without touching saved history.
     const preservedSaved=localStorage.getItem('tb-saved');
