@@ -194,7 +194,7 @@ test('Milestone 3 regression flows with isolated storage and mocked AI',async()=
     const {default:Progress}=await componentModule('src/Progress.jsx');
     const progress=harness.render(Progress,{completed:JSON.parse(localStorage.getItem('tb-completed')),assessments});
     assert.ok(text(progress).includes('Average Practice Score4.0 / 5'));
-    assert.ok(!text(progress).includes('Change from Baseline'));
+    assert.ok(!text(progress).includes('Difference from Baseline'));
     assert.ok(text(progress).includes('Independent Assessment'));
     assert.ok(text(progress).includes('Latest Assessment 5.0 / 5'));
     let historyOpened=false;
@@ -206,18 +206,34 @@ test('Milestone 3 regression flows with isolated storage and mocked AI',async()=
     assert.equal(historyOpened,true);
     const {default:AssessmentHistory}=await componentModule('src/AssessmentHistory.jsx');
     const history=AssessmentHistory({assessments});
-    assert.ok(text(history).includes('Change from Baseline+4.0'));
+    assert.ok(text(history).includes('Difference from Baseline+4.0'));
     assert.equal(nodes(history).filter(node=>node.type==='tbody')[0].props.children.length,2);
     const rows=nodes(history).find(node=>node.type==='tbody').props.children;
     assert.ok(text(rows[0]).includes('5.0 / 5'));
     assert.ok(text(rows[1]).includes('· Baseline'));
     assert.equal(nodes(history).filter(node=>node.type==='details').length,2);
     assert.ok(!nodes(history).some(node=>node.type==='ul'));
+    const details=nodes(history).filter(node=>node.type==='details');
+    assert.ok(text(details[0]).includes('Assessment Summary'));
+    assert.ok(text(details[0]).includes('4.0 higher than your previous assessment'));
+    assert.ok(!text(details[0]).includes('/ 5'));
+    assert.ok(!text(details[1]).includes('Compared with your previous assessment'));
+    const comparisonHistory=AssessmentHistory({assessments:[
+      {...assessments[0],date:'2026-01-01',skills:{meaning:4,grammar:3,naturalness:4}},
+      {...assessments[1],date:'2026-01-02',skills:{meaning:3.6,grammar:3,naturalness:3.6}},
+      {...assessments[1],id:'third',date:'2026-01-03',skills:{meaning:3.7,grammar:3,naturalness:3.6}},
+    ].reverse()});
+    const comparisonDetails=nodes(comparisonHistory).filter(node=>node.type==='details');
+    assert.ok(text(comparisonDetails[0]).includes('Meaning Accuracy: 0.1 higher'));
+    assert.ok(text(comparisonDetails[1]).includes('Meaning Accuracy: 0.4 lower'));
+    assert.ok(text(comparisonDetails[1]).includes('Grammar: no difference'));
+    assert.ok(!text(comparisonDetails[2]).includes('Compared with your previous assessment'));
+    assert.equal(nodes(comparisonHistory).find(node=>node.type==='thead').props.children[0].props.children.length,6);
     const decline=AssessmentHistory({assessments:[assessments[0],{...assessments[1],overall:0.7}]});
-    assert.ok(text(decline).includes('Change from Baseline−0.3'));
+    assert.ok(text(decline).includes('Difference from Baseline−0.3'));
     const single=AssessmentHistory({assessments:[assessments[0]]});
     assert.ok(text(single).includes('Latest Assessment1.0 / 5'));
-    assert.ok(text(single).includes('Change from Baseline—'));
+    assert.ok(text(single).includes('Difference from Baseline—'));
     const landingHarness=hooks();globalThis.__testReact=landingHarness.react;
     const {default:LandingAssessment}=await componentModule('src/Assessment.jsx');
     let landing=landingHarness.render(LandingAssessment,{...props,assessments,showHistory:true});

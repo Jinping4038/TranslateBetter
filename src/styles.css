@@ -130,3 +130,5 @@
 .assessment-page .assessment-progress-section h2{margin-top:0}
 @media(max-width:760px){.assessment-banner{padding:24px;gap:12px}.assessment-banner .assessment-banner-copy h1{font-size:24px}.assessment-banner-art{width:90px}.assessment-banner p{font-size:13px}}
 @media(max-width:480px){.assessment-banner-art{display:none}}
+
+.assessment-record-content h4{font-size:12px;line-height:1.5;margin:16px 0 8px}
