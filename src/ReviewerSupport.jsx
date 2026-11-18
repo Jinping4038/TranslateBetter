@@ -24,20 +24,23 @@ export function ReviewerNotice() {
     <h2 id="reviewer-note-title">Reviewer Note</h2>
     <div id="reviewer-note-description">
       <p>TranslateBetter is designed for Chinese-speaking English learners.</p>
-      <p>If you do not read Chinese, you can use “Show English Meaning” to preview the full learning experience.</p>
+      <p>If you do not read Chinese, you can use “English Meaning” to preview the full learning experience.</p>
     </div>
     <button className="primary" onClick={dismiss} autoFocus>Got it</button>
   </dialog>;
 }
 
-export function ReviewerMeaning({source}) {
+export function ReviewerMeaning({source, audio}) {
   const [visible,setVisible]=useState(false);
   const meaning=reviewerMeanings[source];
-  if(!meaning)return null;
-  return <div className="reviewer-support">
-    <button type="button" className="reviewer-meaning-toggle" aria-expanded={visible} onClick={()=>setVisible(!visible)}>
-      Reviewer Support: {visible?'Hide English Meaning':'Show English Meaning'}
-    </button>
-    {visible&&<p className="reviewer-meaning"><strong>English meaning · Reviewer Support</strong>{meaning}</p>}
+  return <div className="sentence sentence-card">
+    <div className="sentence-row">
+      <span>{source}</span>
+      <div className="sentence-card-actions">
+        {meaning&&<button type="button" className="secondary reviewer-meaning-button" title="Reviewer Support" aria-expanded={visible} onClick={()=>setVisible(!visible)}>English Meaning</button>}
+        {audio}
+      </div>
+    </div>
+    {visible&&meaning&&<p className="reviewer-meaning"><strong>English Meaning:</strong> {meaning}</p>}
   </div>;
 }

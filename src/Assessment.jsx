@@ -147,7 +147,6 @@ export default function Assessment({assessments, onComplete, onPractice, onProgr
     <p className="muted">Translate independently. Your scores will appear after submission.</p>
     <div className="practice-top">Sentence {draft.index + 1} of 5</div>
     <progress className="assessment-progress" value={draft.index + 1} max="5" aria-label="Assessment progress"/>
-    <div className="sentence">{item.zh}</div>
     <ReviewerMeaning key={draft.id+item.zh} source={item.zh}/>
     <form onSubmit={submit}>
       <div className="label-row"><label htmlFor="assessment-answer">Your translation</label></div>
