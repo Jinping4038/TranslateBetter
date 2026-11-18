@@ -147,3 +147,14 @@
 
 .progress-trend-scroll{overflow-x:auto;max-width:100%}
 .progress-charts>.progress-panel{min-width:0}
+
+.reviewer-notice{width:min(440px,calc(100vw - 40px));padding:28px;border:1px solid var(--line);border-radius:14px;color:#17243e;background:white;box-shadow:0 15px 60px #17243e26}
+.reviewer-notice::backdrop{background:#17243e55}
+.reviewer-notice h2{font-family:Manrope,sans-serif;font-size:21px;margin:0 0 16px}
+.reviewer-notice p{font-size:14px;color:#52607a}
+.reviewer-notice .primary{float:right;margin-top:4px}
+.reviewer-support{margin:9px 0 0}
+.reviewer-meaning-toggle{font-size:11px;color:#63728b;padding:5px 0;text-align:left;justify-content:flex-start}
+.reviewer-meaning-toggle:hover{color:var(--blue);text-decoration:underline}
+.reviewer-meaning{font-size:12px;line-height:1.7;color:#43516a;background:#f5f7fc;border:1px solid var(--line);border-radius:7px;padding:12px 14px;margin:6px 0 0}
+.reviewer-meaning strong{display:block;color:#64718a;font-size:10px;margin-bottom:4px;font-weight:650}

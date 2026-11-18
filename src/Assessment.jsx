@@ -1,4 +1,5 @@
 import AssessmentHistory from './AssessmentHistory.jsx';
+import {ReviewerMeaning} from './ReviewerSupport.jsx';
 import React, {useEffect, useRef, useState} from 'react';
 import {assessmentBankVersion, assessmentForms, selectAssessmentForm} from './assessment-exercises.js';
 import {validAssessmentScores, summarizeAssessment} from './assessment-data.js';
@@ -147,6 +148,7 @@ export default function Assessment({assessments, onComplete, onPractice, onProgr
     <div className="practice-top">Sentence {draft.index + 1} of 5</div>
     <progress className="assessment-progress" value={draft.index + 1} max="5" aria-label="Assessment progress"/>
     <div className="sentence">{item.zh}</div>
+    <ReviewerMeaning key={draft.id+item.zh} source={item.zh}/>
     <form onSubmit={submit}>
       <div className="label-row"><label htmlFor="assessment-answer">Your translation</label></div>
       <div className="textarea-wrap">

@@ -9,6 +9,8 @@ import {appendVersions} from '../src/revision-history.js';
 import {practiceProgress} from '../src/progress-data.js';
 import {summarizeAssessment} from '../src/assessment-data.js';
 import {assessmentForms, assessmentBankVersion} from '../src/assessment-exercises.js';
+import exercises from '../src/exercises.js';
+import {reviewerMeanings} from '../src/reviewer-meanings.js';
 
 function storage() {
   const entries = new Map();
@@ -37,9 +39,10 @@ function hooks() {
   };
   return {
     react,
-    render(Component,props={}) {
+    render(Component,props={},mount) {
       cursor=0;pending=[];
       const tree=Component(props);
+      mount?.(tree);
       pending.forEach(effect=>effect());
       return tree;
     },
@@ -182,6 +185,10 @@ test('Milestone 3 regression flows with isolated storage and mocked AI',async()=
       let assessmentTree=assessmentHarness.render(Assessment,{...props,assessments});
       assert.ok(!text(assessmentTree).includes('Hint 1'));
       assert.ok(!text(assessmentTree).includes(draft.items[4].en));
+      const support=nodes(assessmentTree).find(node=>node.type?.name==='ReviewerMeaning');
+      assert.equal(support.props.source,draft.items[4].zh);
+      assert.equal(support.props.key,draft.id+draft.items[4].zh);
+      assert.ok(!text(assessmentTree).includes(reviewerMeanings[draft.items[4].zh]));
       await nodes(assessmentTree).find(node=>node.type==='form').props.onSubmit(event);
       assessmentTree=assessmentHarness.render(Assessment,{...props,assessments});
       assert.ok(text(assessmentTree).includes('Check Your Translation Level'));
@@ -292,6 +299,9 @@ test('Milestone 3 regression flows with isolated storage and mocked AI',async()=
     button(selection,'Start practicing').props.onClick();
     selection=selectionHarness.render(SelectionApp);
     const firstSource=text(nodes(selection).find(node=>node.props?.className==='sentence'));
+    const practiceSupport=nodes(selection).find(node=>node.type?.name==='ReviewerMeaning');
+    assert.ok(firstSource.includes(practiceSupport.props.source));
+    assert.equal(practiceSupport.props.key,practiceSupport.props.source);
     button(selection,'Next sentence').props.onClick();
     selection=selectionHarness.render(SelectionApp);
     const nextSource=text(nodes(selection).find(node=>node.props?.className==='sentence'));
@@ -350,4 +360,57 @@ test('Milestone 3 regression flows with isolated storage and mocked AI',async()=
   } finally {
     globalThis.fetch=originalFetch;
   }
+});
+
+
+test('Reviewer notice persists dismissal and English meaning toggles cover every Practice and Assessment source',async()=>{
+  globalThis.localStorage=storage();
+  localStorage.setItem('tb-assessments','[{"id":"preserved"}]');
+  localStorage.setItem('tb-completed','[{"id":"preserved"}]');
+  const beforeAssessment=localStorage.getItem('tb-assessments');
+  const beforePractice=localStorage.getItem('tb-completed');
+  let noticeHarness=hooks();globalThis.__testReact=noticeHarness.react;
+  let {ReviewerNotice,reviewerNoticeKey}=await componentModule('src/ReviewerSupport.jsx');
+  const nativeDialog={open:false,showModal(){this.open=true;},close(){this.open=false;}};
+  let notice=noticeHarness.render(ReviewerNotice,{},tree=>{tree.props.ref.current=nativeDialog;});
+  assert.equal(notice.type,'dialog');
+  assert.equal(nativeDialog.open,true);
+  assert.ok(text(notice).includes('TranslateBetter is designed for Chinese-speaking English learners.'));
+  assert.ok(text(notice).includes('If you do not read Chinese, you can use “Show English Meaning” to preview the full learning experience.'));
+  button(notice,'Got it').props.onClick();
+  notice=noticeHarness.render(ReviewerNotice);
+  assert.equal(notice,null);
+  assert.equal(nativeDialog.open,false);
+  assert.equal(localStorage.getItem(reviewerNoticeKey),'true');
+  noticeHarness.cleanup();
+  noticeHarness=hooks();globalThis.__testReact=noticeHarness.react;
+  ({ReviewerNotice}=await componentModule('src/ReviewerSupport.jsx'));
+  assert.equal(noticeHarness.render(ReviewerNotice),null); // Refresh/revisit.
+  noticeHarness.cleanup();
+
+  const meaningHarness=hooks();globalThis.__testReact=meaningHarness.react;
+  const {ReviewerMeaning}=await componentModule('src/ReviewerSupport.jsx');
+  const sources=[...exercises,...assessmentForms.flat()];
+  assert.equal(sources.length,120);
+  assert.equal(Object.keys(reviewerMeanings).length,120);
+  for(const sentence of sources){
+    const meaning=reviewerMeanings[sentence.zh];
+    assert.ok(typeof meaning==='string'&&meaning.length>20,sentence.zh);
+    assert.notEqual(meaning,sentence.en); // Separate authored gloss, no reference fallback.
+    let preview=meaningHarness.render(ReviewerMeaning,{source:sentence.zh});
+    assert.ok(!text(preview).includes(meaning));
+    const show=button(preview,'Reviewer Support: Show English Meaning');
+    assert.equal(show.props['aria-expanded'],false);
+    show.props.onClick();
+    preview=meaningHarness.render(ReviewerMeaning,{source:sentence.zh});
+    assert.ok(text(preview).includes(meaning));
+    const hide=button(preview,'Reviewer Support: Hide English Meaning');
+    assert.equal(hide.props['aria-expanded'],true);
+    hide.props.onClick();
+    preview=meaningHarness.render(ReviewerMeaning,{source:sentence.zh});
+    assert.ok(!text(preview).includes(meaning));
+  }
+  assert.equal(localStorage.getItem('tb-assessments'),beforeAssessment);
+  assert.equal(localStorage.getItem('tb-completed'),beforePractice);
+  meaningHarness.cleanup();
 });
