@@ -183,6 +183,11 @@ test('Milestone 3 regression flows with isolated storage and mocked AI',async()=
       const assessmentHarness=hooks();globalThis.__testReact=assessmentHarness.react;
       const {default:Assessment}=await componentModule('src/Assessment.jsx');
       let assessmentTree=assessmentHarness.render(Assessment,{...props,assessments,reviewer:round===1});
+      assert.ok(text(assessmentTree).includes('Check Your Translation Level'));
+      assert.ok(!nodes(assessmentTree).some(node=>node.type==='form'));
+      assert.equal(JSON.parse(localStorage.getItem('tb-assessment-draft')).id,draft.id);
+      button(assessmentTree,'Resume Assessment →').props.onClick();
+      assessmentTree=assessmentHarness.render(Assessment,{...props,assessments,reviewer:round===1});
       assert.ok(!text(assessmentTree).includes('Hint 1'));
       assert.ok(!text(assessmentTree).includes(draft.items[4].en));
       const support=nodes(assessmentTree).find(node=>node.type?.name==='ReviewerMeaning');
@@ -252,6 +257,9 @@ test('Milestone 3 regression flows with isolated storage and mocked AI',async()=
     const firstHarness=hooks();globalThis.__testReact=firstHarness.react;
     const {default:FirstAssessment}=await componentModule('src/Assessment.jsx');
     const first=firstHarness.render(FirstAssessment,{...props,assessments:[]});
+    assert.ok(text(first).includes('Check Your Translation Level'));
+    assert.ok(nodes(first).some(node=>node.type?.name==='AssessmentHistory'));
+    assert.ok(!nodes(first).some(node=>node.type==='form'));
     button(first,'Start Assessment →').props.onClick();
     const started=firstHarness.render(FirstAssessment,{...props,assessments:[]});
     assert.ok(text(started).includes('Sentence 1 of 5'));
@@ -262,10 +270,11 @@ test('Milestone 3 regression flows with isolated storage and mocked AI',async()=
     const draftBefore=localStorage.getItem('tb-assessment-draft');
     const historyHarness=hooks();globalThis.__testReact=historyHarness.react;
     const {default:HistoryAssessment}=await componentModule('src/Assessment.jsx');
-    const historyPage=historyHarness.render(HistoryAssessment,{...props,assessments,showHistory:true});
+    const historyPage=historyHarness.render(HistoryAssessment,{...props,assessments});
     assert.ok(text(historyPage).includes('Check Your Translation Level'));
     assert.ok(nodes(historyPage).some(node=>node.type?.name==='AssessmentHistory'));
     assert.equal(localStorage.getItem('tb-assessment-draft'),draftBefore);
+    assert.ok(!nodes(historyPage).some(node=>node.type==='form'));
     button(historyPage,'Resume Assessment →').props.onClick();
     const resumed=historyHarness.render(HistoryAssessment,{...props,assessments,showHistory:true});
     assert.ok(text(resumed).includes('Sentence 2 of 5'));

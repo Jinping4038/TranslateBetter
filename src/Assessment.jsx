@@ -28,12 +28,8 @@ function createDraft(results) {
 
 export default function Assessment({assessments, onComplete, onPractice, onProgress, showHistory = false, reviewer = false}) {
   const [draft, setDraft] = useState(loadDraft);
-  const [result, setResult] = useState(() => {
-    const previousDraft = loadDraft();
-    const latest = [...assessments].sort((a,b)=>new Date(a.date)-new Date(b.date)).at(-1);
-    if(showHistory || !previousDraft)return latest || null;
-    return assessments.find(item => item.id === previousDraft?.id) || null;
-  });
+  // Enter through the overview even when an unfinished draft exists.
+  const [active, setActive] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [graded, setGraded] = useState(0);
@@ -50,7 +46,7 @@ export default function Assessment({assessments, onComplete, onPractice, onProgr
   function start() {
     try {
       persist(createDraft(assessments));
-      setResult(null);
+      setActive(true);
       setError('');
     } catch { setError('Your browser could not save this assessment. Please check available storage.'); }
   }
@@ -97,7 +93,7 @@ export default function Assessment({assessments, onComplete, onPractice, onProgr
         id: current.id, mode: 'assessment', date: new Date().toISOString(), answers, ...summarizeAssessment(answers),
       };
       await onComplete(completed);
-      setResult(completed);
+      setActive(false);
     } catch (issue) {
       if (controllerRef.current === controller) {
         setError(issue.name === 'AbortError' ? 'Scoring timed out. Retry to continue from the answers already scored.' : issue.message);
@@ -110,13 +106,13 @@ export default function Assessment({assessments, onComplete, onPractice, onProgr
     }
   }
 
-  if (result || !draft) return <main className="utility assessment-page">
+  if (!active || !draft) return <main className="utility assessment-page">
     <section className="assessment-banner">
       <div className="assessment-banner-copy">
         <h1>Check Your Translation Level</h1>
         <p>Take a short assessment to see your current strengths in meaning, grammar, and naturalness. It’s independent, with no hints or AI feedback.</p>
         <button className="primary" onClick={()=>{
-          if(draft&&!assessments.some(item=>item.id===draft.id)){setResult(null);setError('');}
+          if(draft&&!assessments.some(item=>item.id===draft.id)){setActive(true);setError('');}
           else start();
         }}>{draft&&!assessments.some(item=>item.id===draft.id)?'Resume Assessment':assessments.length?'Take Another Assessment':'Start Assessment'} <span aria-hidden="true">→</span></button>
       </div>
