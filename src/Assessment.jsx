@@ -1,7 +1,7 @@
 import AssessmentHistory from './AssessmentHistory.jsx';
 import {ReviewerMeaning} from './ReviewerSupport.jsx';
 import React, {useEffect, useRef, useState} from 'react';
-import {assessmentBankVersion, assessmentForms, selectAssessmentForm} from './assessment-exercises.js';
+import {assessmentBankVersion, assessmentForms, assessmentFormIndex, selectAssessmentForm} from './assessment-exercises.js';
 import {validAssessmentScores, summarizeAssessment} from './assessment-data.js';
 
 const draftKey = 'tb-assessment-draft';
@@ -15,12 +15,14 @@ function loadDraft() {
   return null;
 }
 function createDraft(results) {
+  const form=selectAssessmentForm(results);
   return {
     id: crypto.randomUUID(),
     bankVersion: assessmentBankVersion,
+    formIndex: assessmentFormIndex(form),
     index: 0,
     submitted: false,
-    items: selectAssessmentForm(results).map(exercise => ({
+    items: form.map(exercise => ({
       ...exercise, answer: '', scores: null,
     })),
   };
@@ -90,7 +92,8 @@ export default function Assessment({assessments, onComplete, onPractice, onProgr
       }
       const answers = current.items.map(({zh, answer, scores}) => ({zh, text: answer.trim(), scores}));
       const completed = {
-        id: current.id, mode: 'assessment', date: new Date().toISOString(), answers, ...summarizeAssessment(answers),
+        id: current.id, mode: 'assessment', date: new Date().toISOString(),
+        formIndex: assessmentFormIndex(current.items), answers, ...summarizeAssessment(answers),
       };
       await onComplete(completed);
       setActive(false);

@@ -481,3 +481,75 @@ test('App mode choice persists, switcher selects either mode, and meanings are r
   assert.equal(localStorage.getItem('tb-completed'),beforePractice);
   meaningHarness.cleanup();
 });
+
+test('Assessment runs fixed A–D forms in order, resumes drafts, and retains baseline/history without exposing form names',async()=>{
+  globalThis.localStorage=storage();
+  globalThis.sessionStorage=storage();
+  const originalFetch=globalThis.fetch;
+  let results=[],requests=0;
+  try {
+    globalThis.fetch=async()=>{
+      requests++;
+      const value=results.length+1;
+      return Response.json({feedback:{scores:{meaning:value,grammar:value,naturalness:value}}});
+    };
+    const props=()=>({assessments:results,reviewer:results.length%2===1,
+      onComplete:async result=>{results=await appendRecord('tb-assessments',result);}});
+    for(let round=0;round<5;round++){
+      let flow=hooks();globalThis.__testReact=flow.react;
+      let {default:Assessment}=await componentModule('src/Assessment.jsx');
+      let page=flow.render(Assessment,props());
+      button(page,round===0?'Start Assessment':'Take Another Assessment').props.onClick();
+      page=flow.render(Assessment,props());
+      const current=JSON.parse(localStorage.getItem('tb-assessment-draft'));
+      assert.equal(current.formIndex,round%4);
+      assert.deepEqual(current.items.map(item=>item.zh),assessmentForms[round%4].map(item=>item.zh));
+      const callsBefore=requests;
+      for(let question=0;question<5;question++){
+        const support=nodes(page).find(node=>node.type?.name==='ReviewerMeaning');
+        assert.equal(support.props.source,assessmentForms[round%4][question].zh);
+        assert.equal(support.props.reviewer,round%2===1);
+        assert.ok(!/Set [ABCD]/.test(text(page)));
+        assert.ok(!text(page).includes('Hint 1'));
+        assert.ok(!text(page).includes(assessmentForms[round%4][question].en));
+        nodes(page).find(node=>node.props?.id==='assessment-answer').props.onChange({target:{value:'Independent test answer '+question}});
+        page=flow.render(Assessment,props());
+        assert.equal(requests,callsBefore); // No scoring until all five answers are submitted.
+        if(round===1 && question===1){
+          const savedDraft=localStorage.getItem('tb-assessment-draft');
+          button(page,'Back').props.onClick();
+          flow.render(Assessment,props());
+          flow.cleanup();
+          flow=hooks();globalThis.__testReact=flow.react;
+          ({default:Assessment}=await componentModule('src/Assessment.jsx'));
+          page=flow.render(Assessment,props());
+          assert.ok(text(page).includes('Check Your Translation Level'));
+          assert.equal(localStorage.getItem('tb-assessment-draft'),savedDraft);
+          button(page,'Take Another Assessment').props.onClick();
+          page=flow.render(Assessment,props());
+          assert.equal(nodes(page).find(node=>node.props?.id==='assessment-answer').props.value,'Independent test answer 1');
+          assert.ok(text(page).includes('Sentence 2 of 5'));
+        }
+        if(question<4){button(page,'Next').props.onClick();page=flow.render(Assessment,props());}
+      }
+      await nodes(page).find(node=>node.type==='form').props.onSubmit(event);
+      page=flow.render(Assessment,props());
+      assert.equal(requests,callsBefore+5);
+      assert.equal(results.length,round+1);
+      assert.equal(results[round].formIndex,round%4);
+      assert.equal(results[0].overall,1);
+      assert.ok(text(page).includes('Check Your Translation Level'));
+      assert.ok(!/Set [ABCD]/.test(text(page)));
+      flow.cleanup();
+    }
+    assert.deepEqual(results.map(result=>result.formIndex),[0,1,2,3,0]);
+    const {default:History}=await componentModule('src/AssessmentHistory.jsx');
+    const history=History({assessments:[...results].reverse()});
+    assert.ok(text(history).includes('Baseline Assessment1.0 / 5'));
+    assert.ok(text(history).includes('Latest Assessment5.0 / 5'));
+    assert.ok(text(history).includes('Difference from Baseline+4.0'));
+    assert.equal(nodes(history).find(node=>node.type==='tbody').props.children.length,5);
+    assert.equal(JSON.parse(localStorage.getItem('tb-assessments')).length,5);
+    assert.equal(localStorage.getItem('tb-completed'),null);
+  } finally {globalThis.fetch=originalFetch;}
+});

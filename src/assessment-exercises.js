@@ -32,8 +32,23 @@ export const assessmentForms = [
   ],
 ];
 
+// These four array positions are internal forms A–D; never expose their names in the UI.
+export function assessmentFormIndex(items) {
+  if (!Array.isArray(items) || items.length !== 5) return -1;
+  const sources = new Set(items.map(item => item.zh));
+  return assessmentForms.findIndex(form => sources.size === 5 && form.every(item => sources.has(item.zh)));
+}
+
+export function nextAssessmentFormIndex(results) {
+  if (!results.length) return 0;
+  const latest = [...results].sort((a,b)=>(Date.parse(a.date)||0)-(Date.parse(b.date)||0)).at(-1);
+  // Infer old records from their five source sentences; no history migration is needed.
+  const inferred = assessmentFormIndex(latest.answers);
+  const previous = inferred >= 0 ? inferred :
+    Number.isInteger(latest.formIndex) && latest.formIndex >= 0 && latest.formIndex < assessmentForms.length ? latest.formIndex : -1;
+  return previous >= 0 ? (previous + 1) % assessmentForms.length : results.length % assessmentForms.length;
+}
+
 export function selectAssessmentForm(results) {
-  const seen = new Set(results.flatMap(result => (result.answers || []).map(answer => answer.zh)));
-  return assessmentForms.find(form => form.every(item => !seen.has(item.zh))) ||
-    assessmentForms[results.length % assessmentForms.length];
+  return assessmentForms[nextAssessmentFormIndex(results)];
 }
