@@ -326,6 +326,9 @@ test('Milestone 3 regression flows with isolated storage and mocked AI',async()=
     button(selection,'Need a hint?').props.onClick();
     selection=selectionHarness.render(SelectionApp);
     assert.equal(button(selection,'Hide hints').props['aria-expanded'],true);
+    const vocabulary=nodes(selection).find(node=>node.props?.id==='practice-hints');
+    assert.ok(text(vocabulary).includes('Vocabulary: '));
+    assert.ok(nodes(vocabulary).some(node=>node.type==='b'));
     button(selection,'Show Hint 2').props.onClick();
     selection=selectionHarness.render(SelectionApp);
     button(selection,'Hide hints').props.onClick();

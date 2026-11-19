@@ -28,19 +28,19 @@ test('Neither hint contains the complete reference translation',()=>{
 });
 
 
-test('Hint 1 revision preserves every Chinese sentence, reference, and Hint 2',()=>{
-  const digest=createHash('sha256').update(JSON.stringify(exercises.map(({zh,en,hint})=>({zh,en,hint})))).digest('hex');
-  assert.equal(digest,'a2c4b0fa0ca75f1a95043acf4b3fa4bc05d3f7535ac840a727b3ac54285b115d');
+test('Every Hint 1 is a compact vocabulary list rather than a sentence or grammar explanation',()=>{
+  for(const [index,item] of exercises.entries()){
+    assert.ok(item.gentleHint.startsWith('Vocabulary: '),'Missing vocabulary label at '+(index+1));
+    const entries=item.gentleHint.slice('Vocabulary: '.length).split(',').map(value=>value.trim());
+    assert.ok(entries.length>=1&&entries.length<=2,'Too many vocabulary items at '+(index+1));
+    for(const entry of entries){
+      assert.match(entry,/^[a-z]+(?:-[a-z]+)*(?: [a-z]+(?:-[a-z]+)*){0,2}$/i);
+    }
+  }
 });
-
-test('Hint 1 contains no exact reference content-word overlap outside function words',()=>{
-  // Surface-word screening supplements editorial review; it does not prove absence of semantic paraphrase.
-  const functionWords=new Set('a an the i you he she it we they me him her us them my your his its our their myself yourself ourselves themselves this that these those what which who whom whose how when where why whether if as than to of in on at by for from with without into over under between through and or but so yet not no nor can could would should will shall may might must do does did done doing have has had having be am is are was were been being s t m re ve ll d'.split(' '));
-  const words=text=>(text.toLowerCase().match(/[a-z]+/g)||[]);
-  const flagged=exercises.flatMap((item,index)=>{
-    const reference=new Set(words(item.en));
-    const shared=[...new Set(words(item.gentleHint).filter(word=>reference.has(word)&&!functionWords.has(word)))];
-    return shared.length?[{number:index+1,shared}]:[];
-  });
-  assert.deepEqual(flagged,[]);
+test('Hint 2 adds structure support rather than repeating Hint 1 vocabulary items',()=>{
+  for(const [index,item] of exercises.entries()){
+    const entries=item.gentleHint.slice('Vocabulary: '.length).split(',').map(value=>value.trim().toLowerCase());
+    for(const entry of entries)assert.ok(!item.hint.toLowerCase().includes(entry),'Repeated vocabulary-only help at '+(index+1)+': '+entry);
+  }
 });

@@ -1,580 +1,580 @@
 const exercises = [
-{"zh":"虽然这个工作很有挑战性，但我从中学到了很多东西。","en":"Although this job is challenging, I have learned a lot from it.","gentleHint":"How does “虽然…但…” link the two parts?","hint":"Use one contrast connector: “although” at the start or “but” between the ideas, not both for the same pair of clauses."},
-{"zh":"只要你每天坚持练习，你的英语就会逐渐进步。","en":"As long as you keep practicing every day, your English will gradually improve.","gentleHint":"Which part gives the condition, and which part gives the result?","hint":"“As long as” can introduce the condition; keep “every day” with the practice and use “gradually” for the improvement."},
-{"zh":"与其担心犯错，不如把它当作学习的机会。","en":"Instead of worrying about making mistakes, see them as opportunities to learn.","gentleHint":"Does “与其…不如…” describe a sequence or recommend an alternative?","hint":"“Instead of” takes an -ing form; “see them as” can introduce the alternative way to view mistakes."},
-{"zh":"这本书让我对不同的文化有了更深入的了解。","en":"This book has given me a deeper understanding of different cultures.","gentleHint":"What relationship does “让我” establish between the two parts?","hint":"“Give someone a deeper understanding of” links the book’s effect to the cultures being understood."},
-{"zh":"我原以为这很困难，结果比想象中容易。","en":"I thought it would be difficult, but it turned out to be easier than I expected.","gentleHint":"Notice the gap between an initial assumption and the eventual result.","hint":"“Turned out to be” introduces the actual result; “than I expected” completes the comparison."}
+{"zh":"虽然这个工作很有挑战性，但我从中学到了很多东西。","en":"Although this job is challenging, I have learned a lot from it.","gentleHint":"Vocabulary: challenging, gain","hint":"Use one contrast connector: “although” at the start or “but” between the clauses, not both for the same pair."},
+{"zh":"只要你每天坚持练习，你的英语就会逐渐进步。","en":"As long as you keep practicing every day, your English will gradually improve.","gentleHint":"Vocabulary: consistent, gradually","hint":"“As long as” introduces the condition; use the simple present in that clause and a future form for the result."},
+{"zh":"与其担心犯错，不如把它当作学习的机会。","en":"Instead of worrying about making mistakes, see them as opportunities to learn.","gentleHint":"Vocabulary: mistakes, opportunities","hint":"“Instead of” takes an -ing form; “see them as” can introduce an alternative viewpoint."},
+{"zh":"这本书让我对不同的文化有了更深入的了解。","en":"This book has given me a deeper understanding of different cultures.","gentleHint":"Vocabulary: understanding, cultures","hint":"“Give someone a … of …” can express the effect; a comparative adjective can indicate greater depth."},
+{"zh":"我原以为这很困难，结果比想象中容易。","en":"I thought it would be difficult, but it turned out to be easier than I expected.","gentleHint":"Vocabulary: expect, difficult","hint":"“Turned out to be” introduces the actual result; a clause after “than” can refer back to the original assumption."}
 ];
 const additionalExercises = [
   {
     "zh": "我通常在上班的路上听英语播客。",
     "en": "I usually listen to English podcasts on my way to work.",
-    "gentleHint": "Does “通常” describe a recurring event or a single occasion?",
-    "hint": "Use the simple present for the habit; “on my way to work” places the listening during the commute."
+    "gentleHint": "Vocabulary: podcasts, commute",
+    "hint": "Use the simple present for the habit; “on my way to” can introduce where it happens."
   },
   {
     "zh": "今天早上我差点错过了公交车。",
     "en": "I almost missed the bus this morning.",
-    "gentleHint": "Does “差点” indicate that the event actually occurred?",
-    "hint": "Put “almost” before the past-tense action; it means the missed bus did not actually happen."
+    "gentleHint": "Vocabulary: almost, miss",
+    "hint": "Put the limiting adverb before the main action; use a past-tense verb for the completed occasion."
   },
   {
     "zh": "你能告诉我最近的地铁站在哪里吗？",
     "en": "Could you tell me where the nearest subway station is?",
-    "gentleHint": "Notice that one question is embedded inside a polite request.",
-    "hint": "After “Could you tell me”, use statement order in the embedded question: question word, subject, then verb."
+    "gentleHint": "Vocabulary: nearest, subway",
+    "hint": "After “Could you tell me”, the embedded question uses statement order: question word, subject, then verb."
   },
   {
     "zh": "由于下雨，我们决定把野餐推迟到下周。",
     "en": "Because of the rain, we decided to postpone the picnic until next week.",
-    "gentleHint": "Which clause gives the cause, and which gives the consequence?",
-    "hint": "“Because of” takes a noun phrase; “postpone … until” connects an activity to its new date."
+    "gentleHint": "Vocabulary: postpone, picnic",
+    "hint": "“Because of” takes a noun phrase; “until” can introduce the new date after the main action."
   },
   {
     "zh": "我已经很久没有和大学朋友见面了。",
     "en": "I haven't seen my college friends in a long time.",
-    "gentleHint": "Does “已经很久没有” connect a past period with the present?",
-    "hint": "The present perfect negative fits this continuing absence; “in a long time” expresses its duration."
+    "gentleHint": "Vocabulary: college friends, ages",
+    "hint": "Use the present perfect negative for a continuing absence; “in + duration” can describe the interval up to now."
   },
   {
     "zh": "如果明天天气好，我们就去爬山。",
     "en": "If the weather is good tomorrow, we'll go hiking.",
-    "gentleHint": "Is the opening clause a prediction or a requirement for the later action?",
-    "hint": "In this future conditional, use the present tense after “if”; “go hiking” expresses the planned activity."
+    "gentleHint": "Vocabulary: hiking",
+    "hint": "In a future conditional, use the present tense after “if” and a future form in the result clause."
   },
   {
     "zh": "请在离开之前把所有的灯关掉。",
     "en": "Please turn off all the lights before you leave.",
-    "gentleHint": "Pay attention to the required order of the instruction’s two actions.",
-    "hint": "“Turn off” is the action; after “before”, either give a subject and verb or use an -ing form."
+    "gentleHint": "Vocabulary: switch off",
+    "hint": "Use an imperative for the instruction; “before” can take a clause or an -ing form to order the actions."
   },
   {
     "zh": "我正在找一家安静又不太贵的咖啡馆。",
     "en": "I'm looking for a quiet café that isn't too expensive.",
-    "gentleHint": "Which two restrictions modify the thing being sought?",
-    "hint": "“Look for” expresses the search; describe the cafe with “quiet” and a clause such as “that isn’t too expensive”."
+    "gentleHint": "Vocabulary: affordable, quiet",
+    "hint": "Two descriptions can modify the same noun; a relative clause beginning with “that” can add a requirement."
   },
   {
     "zh": "这家餐厅的食物没有我想象的那么好。",
     "en": "The food at this restaurant isn't as good as I expected.",
-    "gentleHint": "Is the comparison with reality or with an earlier assumption?",
-    "hint": "Use “not as … as” for the unequal comparison, with an expectation clause after the second “as”."
+    "gentleHint": "Vocabulary: expectations, restaurant",
+    "hint": "Use “not as … as” for the unequal comparison; the second “as” can introduce a past-tense clause."
   },
   {
     "zh": "我们最好提前订票，以免到时候没有座位。",
     "en": "We'd better book tickets in advance in case there are no seats left.",
-    "gentleHint": "How does the final clause justify the advice in the opening clause?",
-    "hint": "“Had better” takes a base verb; “in advance” expresses early booking and “in case” introduces the possible problem."
+    "gentleHint": "Vocabulary: in advance, seats",
+    "hint": "“Had better” takes a base verb; “in case” introduces the possible problem the advice anticipates."
   },
   {
     "zh": "我花了半个小时才找到丢失的钥匙。",
     "en": "It took me half an hour to find my lost keys.",
-    "gentleHint": "Which phrase measures duration rather than naming the activity?",
-    "hint": "“It took someone + time + to + verb” expresses how long a task required."
+    "gentleHint": "Vocabulary: half an hour",
+    "hint": "“It took + person + duration + to + verb” expresses the time required for a task."
   },
   {
     "zh": "她一到家就开始准备晚饭。",
     "en": "She started preparing dinner as soon as she got home.",
-    "gentleHint": "How much separation is there between the two actions?",
-    "hint": "“As soon as” links the closely timed actions; use past-tense verbs for both events here."
+    "gentleHint": "Vocabulary: prepare",
+    "hint": "“As soon as” links closely timed actions; use past-tense verbs for both events here."
   },
   {
     "zh": "我以前不喜欢跑步，但现在每周跑三次。",
     "en": "I didn't use to like running, but now I run three times a week.",
-    "gentleHint": "Notice the shift signaled by “以前…现在…”.",
-    "hint": "Use “didn’t use to” for the past state; “three times a week” describes the current frequency."
+    "gentleHint": "Vocabulary: running, weekly",
+    "hint": "“Didn’t use to” describes the former state; switch to the simple present for the current routine."
   },
   {
     "zh": "你介意把窗户打开一点吗？",
     "en": "Would you mind opening the window a little?",
-    "gentleHint": "Think about the tone of the request and the role of “一点”.",
-    "hint": "“Would you mind” takes an -ing form; “a little” can specify the small amount."
+    "gentleHint": "Vocabulary: slightly",
+    "hint": "“Would you mind” takes an -ing form; place the amount of the requested change after the action."
   },
   {
     "zh": "我们应该尽量减少一次性塑料的使用。",
     "en": "We should try to reduce our use of single-use plastic.",
-    "gentleHint": "Does “尽量减少” describe an effort or an absolute prohibition?",
-    "hint": "“Single-use plastic” names the material; “reduce our use of” expresses the desired decrease."
+    "gentleHint": "Vocabulary: single-use plastic, reduce",
+    "hint": "“Should” takes a base verb; “try to” can express an effort rather than an absolute requirement."
   },
   {
     "zh": "这件外套很适合你，而且价格也合理。",
     "en": "This coat suits you well, and the price is reasonable too.",
-    "gentleHint": "Notice that the sentence adds a second, separate positive judgment.",
-    "hint": "“Suit someone” describes how clothing looks on a person; “reasonable” can describe the price."
+    "gentleHint": "Vocabulary: suit, reasonable",
+    "hint": "Link the two positive judgments with “and”; “too” can mark the additional point at the end."
   },
   {
     "zh": "我还没有决定周末要做什么。",
     "en": "I haven't decided what to do this weekend yet.",
-    "gentleHint": "Does “还没有” describe a finished action or a continuing absence?",
-    "hint": "The present perfect negative works with “yet”; “what to do” can follow “decide”."
+    "gentleHint": "Vocabulary: decide, weekend",
+    "hint": "The present perfect negative fits “yet”; “what to + verb” can name the unresolved activity."
   },
   {
     "zh": "他答应会在星期五之前把报告发给我。",
     "en": "He promised to send me the report by Friday.",
-    "gentleHint": "Does “星期五之前” specify a deadline or an exact occasion?",
-    "hint": "“Promise to + verb” expresses the commitment; “by Friday” sets a deadline rather than an exact delivery day."
+    "gentleHint": "Vocabulary: promise, report",
+    "hint": "The first verb can take “to + base verb”; “by Friday” gives a deadline, not an exact occasion."
   },
   {
     "zh": "为了赶上早班飞机，我们必须凌晨四点出发。",
     "en": "We have to leave at four in the morning to catch the early flight.",
-    "gentleHint": "Which part explains the purpose of the stated necessity?",
-    "hint": "Use “to + verb” to introduce the purpose of leaving; “catch a flight” is the natural travel expression."
+    "gentleHint": "Vocabulary: depart, flight",
+    "hint": "“Have to” expresses necessity; a separate “to + verb” phrase can explain the purpose."
   },
   {
     "zh": "即使很忙，我也会每天给父母打电话。",
     "en": "Even when I'm busy, I call my parents every day.",
-    "gentleHint": "Does the opening condition prevent the recurring action?",
-    "hint": "“Even when” can introduce the busy situation; use the simple present for the daily habit."
+    "gentleHint": "Vocabulary: busy, parents",
+    "hint": "“Even when” introduces a situation that does not stop the routine; the simple present fits the recurring action."
   },
   {
     "zh": "我发现早睡能让我第二天更有精神。",
     "en": "I've found that going to bed early gives me more energy the next day.",
-    "gentleHint": "Which phrase could function as the subject of the cause-and-effect clause?",
-    "hint": "An -ing phrase can name the helpful habit; “the next day” refers to the day after that bedtime."
+    "gentleHint": "Vocabulary: energetic, bedtime",
+    "hint": "An -ing phrase can function as a subject; a present-perfect opening can introduce a discovery relevant now."
   },
   {
     "zh": "这条路正在维修，所以我们得绕道走。",
     "en": "This road is being repaired, so we have to take a detour.",
-    "gentleHint": "Who performs the opening action, and is that person identified?",
-    "hint": "Use “is being + past participle” for the ongoing repair; “take a detour” names the alternative route."
+    "gentleHint": "Vocabulary: repair, detour",
+    "hint": "Use “is being + past participle” for ongoing work with an unspecified agent; “so” introduces the consequence."
   },
   {
     "zh": "请提醒我下班后去取包裹。",
     "en": "Please remind me to pick up the package after work.",
-    "gentleHint": "Notice that the requested action concerns a separate action later.",
-    "hint": "Use “remind someone to + verb”; “pick up” can mean collect a parcel."
+    "gentleHint": "Vocabulary: parcel, collect",
+    "hint": "“Remind + person + to + verb” separates the requested reminder from the later action."
   },
   {
     "zh": "我宁愿在家做饭，也不想出去吃。",
     "en": "I'd rather cook at home than eat out.",
-    "gentleHint": "Is the sentence expressing a preference or describing an actual event?",
-    "hint": "Use “would rather” with a base verb and “than” before the alternative activity, also in its base form."
+    "gentleHint": "Vocabulary: cook, eat out",
+    "hint": "Use “would rather + base verb” and “than + base verb” to express the preference."
   },
   {
     "zh": "她总是能把复杂的问题解释得很清楚。",
     "en": "She can always explain complicated problems clearly.",
-    "gentleHint": "What does “得很清楚” tell you about the action?",
-    "hint": "“Complicated” describes the problems; “clearly” is an adverb describing how she explains them."
+    "gentleHint": "Vocabulary: complicated, clearly",
+    "hint": "An adjective can describe the object, while an adverb describes how the action is performed."
   },
   {
     "zh": "我们需要更多时间来比较这两个方案。",
     "en": "We need more time to compare these two options.",
-    "gentleHint": "Which part states a requirement, and which part gives its purpose?",
-    "hint": "“Time to + verb” expresses the task the time is needed for; “compare” directly takes the two options as its object."
+    "gentleHint": "Vocabulary: compare, options",
+    "hint": "“Need more + uncountable noun” states the requirement; an infinitive can give its purpose."
   },
   {
     "zh": "这个项目比我们预期的花费更高。",
     "en": "This project costs more than we expected.",
-    "gentleHint": "Notice the mismatch between an actual amount and an earlier assumption.",
-    "hint": "“Cost more than” expresses the comparison; use a past-tense expectation clause after “than”."
+    "gentleHint": "Vocabulary: cost, project",
+    "hint": "“More than” introduces the comparison; use a past-tense clause for the earlier assumption."
   },
   {
     "zh": "如果你有任何问题，随时联系我。",
     "en": "If you have any questions, feel free to contact me.",
-    "gentleHint": "How does “随时” affect the tone of the invitation?",
-    "hint": "“Feel free to + verb” is a friendly invitation; “any questions” fits the conditional clause."
+    "gentleHint": "Vocabulary: contact, questions",
+    "hint": "“Feel free to + verb” makes a friendly invitation; an “if” clause can state when it applies."
   },
   {
     "zh": "会议结束后，我会整理笔记并发给大家。",
     "en": "After the meeting, I'll organize my notes and send them to everyone.",
-    "gentleHint": "Notice the two linked actions and the repeated object they share.",
-    "hint": "Keep “organize” and “send” parallel after “will”; use a pronoun to refer back to the notes in the second action."
+    "gentleHint": "Vocabulary: organize, notes",
+    "hint": "Keep the two planned verbs parallel after “will”; a pronoun can replace the repeated object in the second action."
   },
   {
     "zh": "他没有直接回答我的问题，而是换了个话题。",
     "en": "He didn't answer my question directly; instead, he changed the subject.",
-    "gentleHint": "How does “而是” relate the actual action to the rejected one?",
-    "hint": "“Change the subject” means switch topics; “instead” can mark the action that replaces answering."
+    "gentleHint": "Vocabulary: directly, subject",
+    "hint": "Contrast a negative past clause with a positive one; “instead” can introduce the replacement action."
   },
   {
     "zh": "我很感谢你在我最需要的时候帮助了我。",
     "en": "I'm grateful that you helped me when I needed it most.",
-    "gentleHint": "Which part states an attitude, and which adds a timing detail?",
-    "hint": "“Be grateful that” can introduce the help received; “when I needed it most” identifies the timing."
+    "gentleHint": "Vocabulary: grateful, support",
+    "hint": "A “that” clause can state the cause of an attitude; a “when” clause can identify the important occasion."
   },
   {
     "zh": "学会倾听和表达自己的想法同样重要。",
     "en": "Learning to listen is just as important as expressing your own ideas.",
-    "gentleHint": "Are the two activities unequal, or are they placed on an equal level?",
-    "hint": "“Just as … as” expresses equality; use -ing phrases to name the activities being compared."
+    "gentleHint": "Vocabulary: express, ideas",
+    "hint": "Use “just as … as” for equality; -ing phrases can name the two abilities being compared."
   },
   {
     "zh": "我们不应该根据一个人的外表来评价他。",
     "en": "We shouldn't judge someone by their appearance.",
-    "gentleHint": "What role does “根据” play in the negative advice?",
-    "hint": "“Judge someone by” introduces the basis of a judgment; “shouldn’t” makes this advice negative."
+    "gentleHint": "Vocabulary: judge, appearance",
+    "hint": "“Shouldn’t + base verb” gives negative advice; “by” can introduce the basis of an evaluation."
   },
   {
     "zh": "这个决定可能会对我们的生活产生长期影响。",
     "en": "This decision could have a long-term impact on our lives.",
-    "gentleHint": "Which phrase qualifies duration, and which signals uncertainty?",
-    "hint": "“Have an impact on” links an effect to what it affects; “long-term” describes its duration."
+    "gentleHint": "Vocabulary: impact, long-term",
+    "hint": "“Could” expresses possibility; the preposition “on” can connect the effect to what is affected."
   },
   {
     "zh": "我越了解这个城市，就越喜欢这里。",
     "en": "The more I learn about this city, the more I like it.",
-    "gentleHint": "Notice how “越…越…” links two changing degrees.",
-    "hint": "The paired pattern “the more …, the more …” expresses this linked change."
+    "gentleHint": "Vocabulary: get to know, appreciate",
+    "hint": "Use the paired pattern “the more …, the more …” for two changes that develop together."
   },
   {
     "zh": "她不仅完成了自己的任务，还帮助了其他同事。",
     "en": "She not only finished her own tasks but also helped her colleagues.",
-    "gentleHint": "Notice that “不仅…还…” adds a second contribution to the first.",
-    "hint": "“Not only … but also …” links the two contributions; keep their verb phrases parallel."
+    "gentleHint": "Vocabulary: colleagues, tasks",
+    "hint": "“Not only … but also …” links the contributions; keep the verb phrases parallel."
   },
   {
     "zh": "在做决定之前，我们应该听听不同的意见。",
     "en": "Before making a decision, we should listen to different opinions.",
-    "gentleHint": "Which action is presented as a prerequisite for the other?",
-    "hint": "“Before + -ing” can introduce the first step; remember the preposition in “listen to”."
+    "gentleHint": "Vocabulary: opinions, decision",
+    "hint": "“Before + -ing” can introduce the first step; remember “to” after “listen”."
   },
   {
     "zh": "我希望将来能有机会在国外生活一段时间。",
     "en": "I hope to have the opportunity to live abroad for a while someday.",
-    "gentleHint": "Notice how “一段时间” limits the scope of the future possibility.",
-    "hint": "Use “an opportunity to + verb” for the chance; “for a while” describes the temporary stay."
+    "gentleHint": "Vocabulary: opportunity, abroad",
+    "hint": "“Hope to + verb” introduces the wish; “for a while” can describe a temporary stay."
   },
   {
     "zh": "失败并不意味着你没有能力。",
     "en": "Failure doesn't mean you're incapable.",
-    "gentleHint": "Is the negative aimed at the event itself or at the conclusion drawn?",
-    "hint": "“Doesn’t mean” separates the event from the conclusion; “incapable” is one way to express lacking ability."
+    "gentleHint": "Vocabulary: failure, incapable",
+    "hint": "Use a present-tense negative main clause; a following clause can state the conclusion being rejected."
   },
   {
     "zh": "重要的不是你学得多快，而是你是否坚持。",
     "en": "What matters is not how fast you learn, but whether you keep going.",
-    "gentleHint": "Which part does “不是…而是…” emphasize, and which does it set aside?",
-    "hint": "“What matters” can introduce the point; “not … but …” contrasts the two criteria, and “whether” introduces persistence."
+    "gentleHint": "Vocabulary: persist, speed",
+    "hint": "“What matters” introduces the main criterion; “not … but whether …” can contrast the two considerations."
   },
   {
     "zh": "我们原计划坐火车，但最后决定开车。",
     "en": "We originally planned to take the train, but decided to drive in the end.",
-    "gentleHint": "Separate the initial intention from the final outcome.",
-    "hint": "“Planned to” introduces the original intention; “in the end” marks the eventual decision."
+    "gentleHint": "Vocabulary: originally, drive",
+    "hint": "“Planned to” introduces the initial intention; “but” and “in the end” can mark the final choice."
   },
   {
     "zh": "这部电影让我想起了自己的童年。",
     "en": "This movie reminded me of my childhood.",
-    "gentleHint": "Is the subject performing a deliberate action or triggering a mental response?",
-    "hint": "“Remind someone of” links a trigger to a memory; use a past-tense verb for the film’s effect here."
+    "gentleHint": "Vocabulary: childhood, memory",
+    "hint": "“Remind + person + of + something” links a trigger to a recollection; use the past tense here."
   },
   {
     "zh": "我已经习惯了在新的城市独自生活。",
     "en": "I've gotten used to living alone in a new city.",
-    "gentleHint": "Does “已经习惯了” describe an adjustment in process or an established state?",
-    "hint": "“Have gotten used to” expresses becoming accustomed to something; “to” here takes an -ing form, not a base verb."
+    "gentleHint": "Vocabulary: accustomed, alone",
+    "hint": "“Have gotten used to” expresses an adjustment completed by now; “to” here takes a noun or an -ing form."
   },
   {
     "zh": "你不必马上回答，可以先考虑一下。",
     "en": "You don't have to answer right away; you can think about it first.",
-    "gentleHint": "Distinguish absence of obligation from a prohibition.",
-    "hint": "“Don’t have to” removes an obligation; “right away” means immediately."
+    "gentleHint": "Vocabulary: immediately, consider",
+    "hint": "“Don’t have to” removes an obligation; it does not prohibit the action."
   },
   {
     "zh": "如果我早点出门，就不会迟到了。",
     "en": "If I had left earlier, I wouldn't have been late.",
-    "gentleHint": "Is this an imagined alternative to a past event or a real future possibility?",
+    "gentleHint": "Vocabulary: set off, earlier",
     "hint": "Use “if + had + past participle” with “would have + past participle” for an unreal past result."
   },
   {
     "zh": "我刚准备出门，电话就响了。",
     "en": "I was just about to leave when the phone rang.",
-    "gentleHint": "Which event was imminent, and which interrupted it?",
-    "hint": "“Was about to + verb” describes the imminent action; “when” can introduce the interrupting past event."
+    "gentleHint": "Vocabulary: ring, departure",
+    "hint": "“Was about to + verb” describes an imminent action; “when” can introduce the interrupting event."
   },
   {
     "zh": "无论结果如何，我都为自己的努力感到骄傲。",
     "en": "Whatever the outcome, I'm proud of the effort I've put in.",
-    "gentleHint": "Notice that “无论…都…” removes a condition on the attitude.",
-    "hint": "“Whatever the outcome” removes the result as a condition; “proud of” introduces what the speaker values."
+    "gentleHint": "Vocabulary: effort, proud",
+    "hint": "“Whatever the outcome” or “no matter how it turns out” can introduce the unconditional opening."
   },
   {
     "zh": "我们需要在工作和休息之间找到平衡。",
     "en": "We need to find a balance between work and rest.",
-    "gentleHint": "Does “之间” call for a single option or an appropriate relationship?",
-    "hint": "“Find a balance between” introduces one side; use “and” to introduce the other."
+    "gentleHint": "Vocabulary: balance",
+    "hint": "“Between … and …” links the two activities; keep their grammatical forms parallel."
   },
   {
     "zh": "这份工作需要耐心，也需要良好的沟通能力。",
     "en": "This job requires both patience and good communication skills.",
-    "gentleHint": "Does “也” present an alternative or an additional condition?",
-    "hint": "“Both … and …” joins the requirements; “communication skills” is the usual expression for that ability."
+    "gentleHint": "Vocabulary: patience, communication skills",
+    "hint": "“Both … and …” joins two required qualities; a simple-present verb can state the requirement."
   },
   {
     "zh": "我没想到一个小小的改变会带来这么大的不同。",
     "en": "I didn't expect such a small change to make such a big difference.",
-    "gentleHint": "Notice the contrast in scale between the cause and its consequence.",
-    "hint": "“Expect + object + to + verb” describes the expectation; “make a difference” expresses the effect."
+    "gentleHint": "Vocabulary: difference, expect",
+    "hint": "An object followed by “to + verb” can complete the first verb; “such a + adjective + noun” emphasizes the contrast in scale."
   },
   {
     "zh": "他建议我们先做一些调查，再开始这个项目。",
     "en": "He suggested doing some research before starting the project.",
-    "gentleHint": "Which action is proposed, and which must follow it?",
-    "hint": "“Suggest doing” can introduce the proposal; use “before + -ing” to show the order of activities."
+    "gentleHint": "Vocabulary: research, suggest",
+    "hint": "An -ing form can follow the reporting verb; “before + -ing” orders the proposed activities."
   },
   {
     "zh": "我正在努力减少花在手机上的时间。",
     "en": "I'm trying to cut down on the time I spend on my phone.",
-    "gentleHint": "Which part names the quantity being adjusted, and which describes it?",
-    "hint": "“Cut down on” means reduce; a clause after “the time” can describe how that time is spent."
+    "gentleHint": "Vocabulary: cut down on, screen time",
+    "hint": "The present continuous fits the current effort; a relative clause can identify how the relevant duration is spent."
   },
   {
     "zh": "与网上购物相比，我更喜欢去实体店。",
     "en": "I prefer shopping in physical stores to shopping online.",
-    "gentleHint": "Are the two alternatives expressed in matching grammatical forms?",
-    "hint": "Use “prefer … to …”; matching -ing phrases can name the two shopping activities."
+    "gentleHint": "Vocabulary: physical stores, prefer",
+    "hint": "Use matching -ing phrases for the two alternatives, joined by “to” rather than “than”."
   },
   {
     "zh": "这个应用让我更容易记录每天的开支。",
     "en": "This app makes it easier for me to track my daily expenses.",
-    "gentleHint": "What roles do “让” and “更” play in the sentence?",
-    "hint": "“Make it easier for someone to + verb” expresses the benefit; “track expenses” names the task."
+    "gentleHint": "Vocabulary: expenses, track",
+    "hint": "“Make it easier for + person + to + verb” expresses how something helps with a task."
   },
   {
     "zh": "我忘记带充电器了，手机快没电了。",
     "en": "I forgot to bring my charger, and my phone is running out of battery.",
-    "gentleHint": "Distinguish the earlier completed action from the situation developing now.",
-    "hint": "Use a past-tense verb for forgetting; “is running out of” describes a supply becoming exhausted now."
+    "gentleHint": "Vocabulary: charger, battery",
+    "hint": "Use the simple past for the completed action; “is running out of” describes the current developing situation."
   },
   {
     "zh": "你能帮我检查一下这封邮件有没有语法错误吗？",
     "en": "Could you help me check this email for grammatical errors?",
-    "gentleHint": "How can the wording soften a request for assistance?",
-    "hint": "“Check something for” introduces the problem being sought; “grammatical errors” names that problem."
+    "gentleHint": "Vocabulary: check, grammatical",
+    "hint": "“Could you help me + base verb” makes a polite request; “for” can introduce the kind of problem being sought."
   },
   {
     "zh": "她说话很轻，所以我几乎听不清。",
     "en": "She spoke so quietly that I could barely hear her.",
-    "gentleHint": "Notice the degree-and-result relationship signaled by “很…所以…”.",
-    "hint": "“So + adverb + that” can link the quiet speech to its result; “barely” means almost not."
+    "gentleHint": "Vocabulary: quietly, barely",
+    "hint": "“So + adverb + that” links the manner of an action to its result."
   },
   {
     "zh": "我需要一张靠窗的桌子，这样光线会好一些。",
     "en": "I need a table by the window so that I'll have better light.",
-    "gentleHint": "How does the second clause justify the feature requested in the first?",
-    "hint": "“By the window” describes the location; “so that” can introduce the desired lighting benefit."
+    "gentleHint": "Vocabulary: by the window, lighting",
+    "hint": "“So that” can introduce the desired benefit of a choice; follow it with a clause."
   },
   {
     "zh": "这双鞋穿起来很舒服，适合长时间走路。",
     "en": "These shoes are comfortable and suitable for long walks.",
-    "gentleHint": "Does the second description repeat the first, or add a different criterion?",
-    "hint": "“Comfortable” describes the feeling; “suitable for” introduces the activity the shoes fit."
+    "gentleHint": "Vocabulary: comfortable, suitable",
+    "hint": "Join the two descriptions with “and”; “for” can introduce the relevant activity as a noun or an -ing form."
   },
   {
     "zh": "我们到达车站时，火车已经开走了。",
     "en": "By the time we arrived at the station, the train had already left.",
-    "gentleHint": "Which of the two events precedes the other?",
-    "hint": "The past perfect marks the earlier event; “by the time” can introduce the later arrival."
+    "gentleHint": "Vocabulary: station, depart",
+    "hint": "Use the past perfect for the earlier event; “by the time” can introduce the later one in the simple past."
   },
   {
     "zh": "这次旅行最让我难忘的是当地人的热情。",
     "en": "What I remember most about this trip is the warmth of the local people.",
-    "gentleHint": "Which element is singled out by “最…的是”?",
-    "hint": "A “What … most” clause can introduce that feature; “warmth” can describe the local people’s friendliness."
+    "gentleHint": "Vocabulary: warmth, local",
+    "hint": "A “What … most” clause can act as the subject; place the emphasized detail after “is”."
   },
   {
     "zh": "我想预订一个可以免费取消的房间。",
     "en": "I'd like to book a room with free cancellation.",
-    "gentleHint": "Notice how “可以免费取消” qualifies what is being requested.",
-    "hint": "Use “book” or “reserve” for 预订; “free cancellation” expresses the condition attached to the room."
+    "gentleHint": "Vocabulary: reserve, cancellation",
+    "hint": "Attach the extra condition with “with + noun phrase”; a polite opening such as “I’d like to” can introduce the request."
   },
   {
     "zh": "你知道这张票是否包含行李费用吗？",
     "en": "Do you know whether this ticket includes baggage fees?",
-    "gentleHint": "Is the embedded question asking for a location or a yes-or-no judgment?",
-    "hint": "“Whether” or “if” can introduce the embedded question; “includes baggage fees” describes the possible coverage."
+    "gentleHint": "Vocabulary: baggage, fees",
+    "hint": "After “Do you know”, use “whether” or “if” and statement word order in the embedded question."
   },
   {
     "zh": "我们迷路了，幸好有人帮我们指路。",
     "en": "We got lost, but luckily someone gave us directions.",
-    "gentleHint": "How does “幸好” affect the relationship between the two clauses?",
-    "hint": "“Get lost” describes the problem; “give someone directions” describes the help."
+    "gentleHint": "Vocabulary: directions, lost",
+    "hint": "Use past-tense clauses for the two events; “but luckily” can mark the favorable turn."
   },
   {
     "zh": "这家博物馆每周一不对外开放。",
     "en": "This museum is closed to the public every Monday.",
-    "gentleHint": "Does “每周一” describe a one-off event or a recurring rule?",
-    "hint": "“Closed to the public” describes visitor access; “every Monday” expresses the recurring day."
+    "gentleHint": "Vocabulary: closed, public",
+    "hint": "“Be + adjective” describes the state; a recurring-day expression can give the schedule."
   },
   {
     "zh": "我想尝试当地的食物，而不是只去熟悉的餐厅。",
     "en": "I'd like to try local food instead of only going to familiar restaurants.",
-    "gentleHint": "What does “只” add to the contrast introduced by “而不是”?",
-    "hint": "“Instead of” introduces the alternative being avoided; use an -ing form after this preposition."
+    "gentleHint": "Vocabulary: local, familiar",
+    "hint": "Use “instead of + -ing” for the alternative being avoided, keeping “only” with that alternative."
   },
   {
     "zh": "请问走到海边大约需要多长时间？",
     "en": "Excuse me, about how long does it take to walk to the beach?",
-    "gentleHint": "Is “多长时间” asking for duration or distance?",
-    "hint": "“How long does it take to + verb?” asks about duration; “about” makes the requested estimate approximate."
+    "gentleHint": "Vocabulary: beach, approximately",
+    "hint": "“How long does it take to + verb?” asks about duration; an opening such as “Excuse me” makes it polite."
   },
   {
     "zh": "我们应该给自己留出足够的转机时间。",
     "en": "We should allow ourselves enough time for the connection.",
-    "gentleHint": "What role does “足够” play in the practical advice?",
-    "hint": "“Allow enough time for” expresses planning sufficient time; “connection” can refer to the transfer between flights."
+    "gentleHint": "Vocabulary: allow, connection",
+    "hint": "A reflexive pronoun can refer back to the people arranging things; “enough + uncountable noun” expresses sufficiency."
   },
   {
     "zh": "我把护照放在包里了，但现在找不到。",
     "en": "I put my passport in my bag, but I can't find it now.",
-    "gentleHint": "Why might the two clauses require different tense choices?",
-    "hint": "Use the simple past for placing it and “can’t find” for the current problem; “put” has the same present and past form."
+    "gentleHint": "Vocabulary: passport",
+    "hint": "Use a past-tense verb for the earlier action and a present-tense negative for the current problem."
   },
   {
     "zh": "虽然旅途很累，但沿途的风景非常值得。",
     "en": "Although the journey was tiring, the scenery along the way made it worthwhile.",
-    "gentleHint": "How do “虽然…但…” connect a drawback with an evaluation?",
-    "hint": "“Although” can introduce the drawback; “make it worthwhile” expresses why the experience was worth the effort."
+    "gentleHint": "Vocabulary: tiring, worthwhile",
+    "hint": "“Although” can introduce the drawback; do not add “but” to connect the same two clauses."
   },
   {
     "zh": "我想学习如何更清楚地表达自己的观点。",
     "en": "I want to learn how to express my opinions more clearly.",
-    "gentleHint": "Which part names the intended skill, and which qualifies the manner?",
-    "hint": "“Learn how to + verb” introduces the skill; “express my opinions” names it, with “more clearly” describing the improvement."
+    "gentleHint": "Vocabulary: express, opinions",
+    "hint": "“Learn how to + verb” introduces the intended skill; a comparative adverb can describe the desired improvement."
   },
   {
     "zh": "每次遇到生词，我都会先根据上下文猜意思。",
     "en": "Whenever I come across an unfamiliar word, I first try to guess its meaning from the context.",
-    "gentleHint": "Does “每次…先…” describe a single sequence or a recurring procedure?",
-    "hint": "“Whenever” expresses the repeated situation; “guess its meaning from the context” describes the first strategy."
+    "gentleHint": "Vocabulary: unfamiliar, context",
+    "hint": "“Whenever” with the simple present fits this recurring situation; “first” marks the initial strategy."
   },
   {
     "zh": "与其死记单词，不如把它们放在句子里练习。",
     "en": "Instead of memorizing words mechanically, practice using them in sentences.",
-    "gentleHint": "How does “与其…不如…” distinguish the discouraged method from the recommendation?",
-    "hint": "After “instead of”, use an -ing form; “practice using” introduces the recommended way to work with the words."
+    "gentleHint": "Vocabulary: mechanically, memorize",
+    "hint": "After “instead of”, use an -ing form; an imperative can introduce the recommended alternative."
   },
   {
     "zh": "我能看懂大部分内容，但说起来还不够流利。",
     "en": "I can understand most of the content, but I'm still not very fluent when I speak.",
-    "gentleHint": "Notice that the two clauses evaluate different abilities.",
-    "hint": "“Most of the content” describes what is understood; “not very fluent when I speak” can qualify the speaking ability."
+    "gentleHint": "Vocabulary: fluent, content",
+    "hint": "Link the ability and its limitation with “but”; a “when” clause can specify the situation where the limitation applies."
   },
   {
     "zh": "你能说慢一点，让我记下来吗？",
     "en": "Could you speak a little more slowly so I can write it down?",
-    "gentleHint": "How does the final clause support the politeness and purpose of the request?",
-    "hint": "“More slowly” describes the requested change; “write it down” means record the information in writing."
+    "gentleHint": "Vocabulary: slowly, note down",
+    "hint": "A “Could you …?” request can be followed by “so I can …” to give its purpose."
   },
   {
     "zh": "这个词在正式和非正式场合的用法不同。",
     "en": "This word is used differently in formal and informal situations.",
-    "gentleHint": "What is being contrasted by “正式和非正式”?",
-    "hint": "A passive form such as “is used” fits the focus on usage; “formal and informal situations” names the contrast."
+    "gentleHint": "Vocabulary: formal, informal",
+    "hint": "Use a passive clause to focus on usage; an adverb can describe the difference across contexts."
   },
   {
     "zh": "我最近开始用英语写日记。",
     "en": "I've recently started keeping a diary in English.",
-    "gentleHint": "Does “最近开始” emphasize a distant event or a new ongoing activity?",
-    "hint": "“Start keeping a diary” names the habit; the present perfect can connect its recent beginning with now."
+    "gentleHint": "Vocabulary: diary, recently",
+    "hint": "The present perfect connects the beginning to now; an -ing form can follow “start”."
   },
   {
     "zh": "如果只看答案而不自己练习，就很难真正进步。",
     "en": "It's hard to make real progress if you only look at the answers without practicing yourself.",
-    "gentleHint": "What necessary element is absent in the situation described by “只…而不…”?",
-    "hint": "“Without + -ing” expresses the missing activity; “make progress” describes the desired improvement."
+    "gentleHint": "Vocabulary: progress, independently",
+    "hint": "An “if” clause can state the condition; “without + -ing” expresses the missing activity."
   },
   {
     "zh": "我想先自己试一下，然后再看参考答案。",
     "en": "I'd like to try it myself first and then look at the reference answer.",
-    "gentleHint": "Notice the order of actions and the emphasis carried by “自己”.",
-    "hint": "Use “first” and “then” to order the actions; “myself” emphasizes the independent attempt."
+    "gentleHint": "Vocabulary: attempt, reference answer",
+    "hint": "“First” and “then” order the actions; a reflexive pronoun emphasizes the independent effort."
   },
   {
     "zh": "你能举个例子说明这两个词的区别吗？",
     "en": "Could you give an example to explain the difference between these two words?",
-    "gentleHint": "How can the request introduce both a means and its purpose?",
-    "hint": "“Give an example” expresses the request; “the difference between these two words” names what it should explain."
+    "gentleHint": "Vocabulary: distinction, example",
+    "hint": "A polite “Could you …?” question can include an infinitive of purpose; “between” can introduce the pair being discussed."
   },
   {
     "zh": "我答应自己每天至少练习十分钟。",
     "en": "I promised myself I would practice for at least ten minutes every day.",
-    "gentleHint": "Which phrase sets a lower boundary rather than an exact quantity?",
-    "hint": "“Promise myself” expresses the commitment; use “for at least” before the minimum duration."
+    "gentleHint": "Vocabulary: promise, at least",
+    "hint": "For a past commitment, “would + base verb” can express the future action; “for” introduces its duration."
   },
   {
     "zh": "我们应该把大目标分成几个容易完成的小任务。",
     "en": "We should break big goals down into smaller, manageable tasks.",
-    "gentleHint": "Notice how “分成” relates the whole to its components.",
-    "hint": "“Break … down into” describes dividing a goal; “manageable” describes tasks that are practical to finish."
+    "gentleHint": "Vocabulary: manageable, divide",
+    "hint": "“Break … down into …” links a whole to its parts; an adjective can describe the resulting pieces."
   },
   {
     "zh": "我发现把通知关掉以后更容易集中注意力。",
     "en": "I've found it easier to concentrate after turning off notifications.",
-    "gentleHint": "Which action comes earlier, and which clause reports its consequence?",
-    "hint": "“Find it easier to + verb” expresses the improvement; “after + -ing” links it to disabling notifications."
+    "gentleHint": "Vocabulary: notifications, concentrate",
+    "hint": "“Find it easier to + verb” expresses the helpful change; “after + -ing” identifies what preceded it."
   },
   {
     "zh": "不要因为一天没有进步就放弃整个计划。",
     "en": "Don't give up on the whole plan just because you haven't made progress for one day.",
-    "gentleHint": "Is the reason introduced by “因为” strong enough for the discouraged action?",
-    "hint": "“Give up on” expresses abandoning the plan; “just because” can introduce the insufficient reason."
+    "gentleHint": "Vocabulary: give up, progress",
+    "hint": "Use “Don’t + base verb” for the advice; “just because” can introduce the insufficient reason."
   },
   {
     "zh": "她用了几个月的时间养成了每天阅读的习惯。",
     "en": "It took her a few months to develop the habit of reading every day.",
-    "gentleHint": "Separate the duration of a transition from the frequency of the resulting activity.",
-    "hint": "“It took her + time + to + verb” expresses the development period; “the habit of + -ing” names the habit."
+    "gentleHint": "Vocabulary: habit, develop",
+    "hint": "The pattern “It took + person + duration + to + verb” measures an interval; “of + -ing” can specify a recurring activity."
   },
   {
     "zh": "我希望下个月能比现在更有信心。",
     "en": "I hope I'll feel more confident next month than I do now.",
-    "gentleHint": "Does the comparison involve two people or two stages?",
-    "hint": "Use “more confident” for the comparison; “than I do now” can refer back to the current feeling."
+    "gentleHint": "Vocabulary: confident",
+    "hint": "Use a comparative adjective followed by “than”; the second clause can refer back to the present feeling."
   },
   {
     "zh": "只要方法合适，短时间的练习也能有效果。",
     "en": "As long as you use the right approach, even short practice sessions can be effective.",
-    "gentleHint": "Notice how “只要” and “也” affect the claim.",
-    "hint": "“As long as” introduces the condition; “effective” describes practice that produces results."
+    "gentleHint": "Vocabulary: effective, approach",
+    "hint": "“As long as” introduces the condition; “even” can emphasize that the limited amount is still relevant."
   },
   {
     "zh": "休息并不是浪费时间，而是为了更好地继续。",
     "en": "Resting isn't a waste of time; it helps you carry on more effectively.",
-    "gentleHint": "Which interpretation is rejected, and which purpose replaces it?",
-    "hint": "“A waste of time” names the rejected view; “carry on more effectively” expresses the benefit."
+    "gentleHint": "Vocabulary: waste, continue",
+    "hint": "An -ing phrase can name the activity; contrast a negative statement with a positive explanation of its purpose."
   },
   {
     "zh": "我正在学习接受自己不可能事事完美。",
     "en": "I'm learning to accept that I can't be perfect at everything.",
-    "gentleHint": "Does “正在” describe a finished achievement or a continuing process?",
-    "hint": "“Accept that” introduces what must be acknowledged; “perfect at everything” expresses the unrealistic standard."
+    "gentleHint": "Vocabulary: accept, perfect",
+    "hint": "Use the present continuous for an ongoing process; a “that” clause can contain the negative claim."
   },
   {
     "zh": "当任务太多时，我会先列出最重要的三件事。",
     "en": "When I have too many tasks, I start by listing the three most important ones.",
-    "gentleHint": "How does “先” organize the response to the opening condition?",
-    "hint": "“Start by + -ing” introduces the first step; “the three most important” selects the priorities."
+    "gentleHint": "Vocabulary: priorities, list",
+    "hint": "A “when” clause can give the trigger; “start by + -ing” introduces the response."
   },
   {
     "zh": "我们不能控制一切，但可以选择如何回应。",
     "en": "We can't control everything, but we can choose how to respond.",
-    "gentleHint": "How does the negation in the first clause contrast with the second?",
-    "hint": "“Can’t … but can …” marks the contrast; “how to respond” names the choice that remains."
+    "gentleHint": "Vocabulary: respond, control",
+    "hint": "Contrast “can’t” with “can”; “how to + base verb” can name the remaining choice."
   },
   {
     "zh": "这段经历让我明白了耐心的重要性。",
     "en": "This experience taught me the importance of patience.",
-    "gentleHint": "What roles do “这段经历” and “让我明白” play in the sentence?",
-    "hint": "“Teach someone the importance of” links an experience to the lesson learned."
+    "gentleHint": "Vocabulary: patience, importance",
+    "hint": "“Teach + person + noun phrase” can express the effect of an experience; “of” introduces the lesson’s topic."
   },
   {
     "zh": "如果有机会重新开始，我还是会做同样的选择。",
     "en": "If I had the chance to start over, I would make the same choice.",
-    "gentleHint": "Is the opening condition an actual event or an imagined possibility?",
-    "hint": "Use “if + past tense” with “would + base verb” for this hypothetical choice; “start over” means begin again."
+    "gentleHint": "Vocabulary: chance, restart",
+    "hint": "Use “if + past tense” with “would + base verb” for an imagined possibility."
   },
   {
     "zh": "有时候，问一个好问题比立刻给出答案更有帮助。",
     "en": "Sometimes asking a good question is more helpful than giving an immediate answer.",
-    "gentleHint": "Are two objects being compared, or two activities?",
-    "hint": "Compare two -ing phrases using “more helpful than”; “immediate” can describe the answer."
+    "gentleHint": "Vocabulary: helpful, immediate",
+    "hint": "Compare two -ing phrases using “more + adjective + than”."
   },
   {
     "zh": "我还在学习，但我已经比昨天更进一步了。",
     "en": "I'm still learning, but I've already taken another step forward since yesterday.",
-    "gentleHint": "How do “还在” and “已经” distinguish the two aspects of the situation?",
-    "hint": "“Still” marks the ongoing learning; “take a step forward” expresses progress, and “since yesterday” links it to the present."
+    "gentleHint": "Vocabulary: step forward",
+    "hint": "Contrast an ongoing activity with a present-perfect achievement; “since” introduces the starting point."
   }
 ];
 
