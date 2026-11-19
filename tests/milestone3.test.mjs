@@ -279,7 +279,7 @@ test('Milestone 3 regression flows with isolated storage and mocked AI',async()=
     const resumed=historyHarness.render(HistoryAssessment,{...props,assessments,showHistory:true});
     assert.ok(text(resumed).includes('Sentence 2 of 5'));
     assert.equal(nodes(resumed).find(node=>node.props?.id==='assessment-answer').props.value,'Partial answer');
-    button(resumed,'Back to Assessment').props.onClick();
+    button(resumed,'Back').props.onClick();
     const returned=historyHarness.render(HistoryAssessment,{...props,assessments});
     assert.ok(text(returned).includes('Check Your Translation Level'));
     assert.ok(!text(returned).includes('Resume Assessment'));
