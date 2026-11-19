@@ -182,11 +182,15 @@ test('Milestone 3 regression flows with isolated storage and mocked AI',async()=
       localStorage.setItem('tb-assessment-draft',JSON.stringify(draft));
       const assessmentHarness=hooks();globalThis.__testReact=assessmentHarness.react;
       const {default:Assessment}=await componentModule('src/Assessment.jsx');
-      let assessmentTree=assessmentHarness.render(Assessment,{...props,assessments});
+      let assessmentTree=assessmentHarness.render(Assessment,{...props,assessments,reviewer:round===1});
       assert.ok(!text(assessmentTree).includes('Hint 1'));
       assert.ok(!text(assessmentTree).includes(draft.items[4].en));
       const support=nodes(assessmentTree).find(node=>node.type?.name==='ReviewerMeaning');
       assert.equal(support.props.source,draft.items[4].zh);
+      assert.equal(support.props.reviewer,round===1);
+      const storedDraftBeforeModeSwitch=localStorage.getItem('tb-assessment-draft');
+      assessmentHarness.render(Assessment,{...props,assessments,reviewer:round!==1});
+      assert.equal(localStorage.getItem('tb-assessment-draft'),storedDraftBeforeModeSwitch);
       assert.equal(support.props.key,draft.id+draft.items[4].zh);
       assert.ok(!text(assessmentTree).includes(reviewerMeanings[draft.items[4].zh]));
       await nodes(assessmentTree).find(node=>node.type==='form').props.onSubmit(event);
@@ -300,6 +304,20 @@ test('Milestone 3 regression flows with isolated storage and mocked AI',async()=
     selection=selectionHarness.render(SelectionApp);
     const firstSource=nodes(selection).find(node=>node.type?.name==='ReviewerMeaning').props.source;
     const practiceSupport=nodes(selection).find(node=>node.type?.name==='ReviewerMeaning');
+    assert.equal(practiceSupport.props.reviewer,false);
+    const recordsBeforeModeSwitch=localStorage.getItem('tb-completed');
+    nodes(selection).find(node=>node.props?.id==='translation').props.onChange({target:{value:'An active draft.'}});
+    selection=selectionHarness.render(SelectionApp);
+    nodes(selection).find(node=>node.type?.name==='AppModeSwitcher').props.onSelect('reviewer');
+    selection=selectionHarness.render(SelectionApp);
+    assert.equal(nodes(selection).find(node=>node.type?.name==='ReviewerMeaning').props.reviewer,true);
+    assert.equal(nodes(selection).find(node=>node.props?.id==='translation').props.value,'An active draft.');
+    assert.equal(localStorage.getItem('tb-completed'),recordsBeforeModeSwitch);
+    assert.equal(localStorage.getItem('tb-assessments'),preservedAssessments);
+    nodes(selection).find(node=>node.type?.name==='AppModeSwitcher').props.onSelect('learner');
+    selection=selectionHarness.render(SelectionApp);
+    assert.equal(nodes(selection).find(node=>node.type?.name==='ReviewerMeaning').props.reviewer,false);
+    assert.equal(nodes(selection).find(node=>node.props?.id==='translation').props.value,'An active draft.');
     assert.ok(firstSource.includes(practiceSupport.props.source));
     assert.equal(practiceSupport.props.key,practiceSupport.props.source);
     button(selection,'Next sentence').props.onClick();
@@ -363,29 +381,38 @@ test('Milestone 3 regression flows with isolated storage and mocked AI',async()=
 });
 
 
-test('Reviewer notice persists dismissal and English meaning toggles cover every Practice and Assessment source',async()=>{
+test('App mode choice persists, switcher selects either mode, and meanings are reviewer-only for all sources',async()=>{
   globalThis.localStorage=storage();
   localStorage.setItem('tb-assessments','[{"id":"preserved"}]');
   localStorage.setItem('tb-completed','[{"id":"preserved"}]');
+  localStorage.setItem('tb-reviewer-notice-dismissed','true');
   const beforeAssessment=localStorage.getItem('tb-assessments');
   const beforePractice=localStorage.getItem('tb-completed');
-  let noticeHarness=hooks();globalThis.__testReact=noticeHarness.react;
-  let {ReviewerNotice,reviewerNoticeKey}=await componentModule('src/ReviewerSupport.jsx');
+  const noticeHarness=hooks();globalThis.__testReact=noticeHarness.react;
+  const {AppModeChooser,AppModeSwitcher,appModeKey,readAppMode}=await componentModule('src/ReviewerSupport.jsx');
+  assert.equal(readAppMode(),null); // Old reviewer dismissal is not an app-mode choice.
+  let mode=readAppMode();
+  const onSelect=value=>{mode=value;localStorage.setItem(appModeKey,value);};
   const nativeDialog={open:false,showModal(){this.open=true;},close(){this.open=false;}};
-  let notice=noticeHarness.render(ReviewerNotice,{},tree=>{tree.props.ref.current=nativeDialog;});
+  let notice=noticeHarness.render(AppModeChooser,{mode,onSelect},tree=>{tree.props.ref.current=nativeDialog;});
   assert.equal(notice.type,'dialog');
   assert.equal(nativeDialog.open,true);
-  assert.ok(text(notice).includes('TranslateBetter is designed for Chinese-speaking English learners.'));
-  assert.ok(text(notice).includes('If you do not read Chinese, you can use “English Meaning” to preview the full learning experience.'));
-  button(notice,'Got it').props.onClick();
-  notice=noticeHarness.render(ReviewerNotice);
+  assert.ok(text(notice).includes('Welcome to TranslateBetter'));
+  assert.ok(text(notice).includes('No translation assistance is provided.'));
+  button(notice,'Learner Version').props.onClick();
+  notice=noticeHarness.render(AppModeChooser,{mode,onSelect});
   assert.equal(notice,null);
   assert.equal(nativeDialog.open,false);
-  assert.equal(localStorage.getItem(reviewerNoticeKey),'true');
-  noticeHarness.cleanup();
-  noticeHarness=hooks();globalThis.__testReact=noticeHarness.react;
-  ({ReviewerNotice}=await componentModule('src/ReviewerSupport.jsx'));
-  assert.equal(noticeHarness.render(ReviewerNotice),null); // Refresh/revisit.
+  assert.equal(readAppMode(),'learner');
+  const revisitHarness=hooks();globalThis.__testReact=revisitHarness.react;
+  const {AppModeChooser:RevisitedChooser}=await componentModule('src/ReviewerSupport.jsx');
+  assert.equal(revisitHarness.render(RevisitedChooser,{mode:readAppMode(),onSelect}),null);
+  revisitHarness.cleanup();
+  const switcher=AppModeSwitcher({mode,onSelect});
+  nodes(switcher).find(node=>node.type==='select').props.onChange({target:{value:'reviewer'}});
+  assert.equal(readAppMode(),'reviewer');
+  assert.equal(localStorage.getItem('tb-assessments'),beforeAssessment);
+  assert.equal(localStorage.getItem('tb-completed'),beforePractice);
   noticeHarness.cleanup();
 
   const meaningHarness=hooks();globalThis.__testReact=meaningHarness.react;
@@ -397,23 +424,34 @@ test('Reviewer notice persists dismissal and English meaning toggles cover every
     const meaning=reviewerMeanings[sentence.zh];
     assert.ok(typeof meaning==='string'&&meaning.length>20,sentence.zh);
     assert.notEqual(meaning,sentence.en); // Separate authored gloss, no reference fallback.
-    let preview=meaningHarness.render(ReviewerMeaning,{source:sentence.zh,audio:'audio-control'});
+    let preview=meaningHarness.render(ReviewerMeaning,{source:sentence.zh,audio:'audio-control',reviewer:true});
     assert.ok(text(preview).includes('audio-control'));
     const actionRow=nodes(preview).find(node=>node.props?.className==='sentence-card-actions');
     assert.ok(actionRow.props.children.some(node=>node?.type==='button'));
     assert.ok(!text(preview).includes('Reviewer Support: Show'));
     assert.ok(!text(preview).includes(meaning));
+    let learner=meaningHarness.render(ReviewerMeaning,{source:sentence.zh,reviewer:false,audio:'audio-control'});
+    assert.ok(!text(learner).includes('English Meaning'));
+    assert.ok(text(learner).includes(sentence.zh));
+    assert.ok(text(learner).includes('audio-control'));
+    preview=meaningHarness.render(ReviewerMeaning,{source:sentence.zh,reviewer:true});
     const show=button(preview,'English Meaning');
     assert.equal(show.props['aria-expanded'],false);
     show.props.onClick();
-    preview=meaningHarness.render(ReviewerMeaning,{source:sentence.zh});
+    preview=meaningHarness.render(ReviewerMeaning,{source:sentence.zh,reviewer:true});
     assert.ok(text(preview).includes(meaning));
     assert.ok(text(preview).includes('English Meaning:'));
     assert.equal(preview.props.className,'sentence sentence-card');
+    const switched=meaningHarness.render(ReviewerMeaning,{source:sentence.zh,reviewer:false});
+    assert.ok(!text(switched).includes(meaning));
+    const reopened=meaningHarness.render(ReviewerMeaning,{source:sentence.zh,reviewer:true});
+    assert.ok(!text(reopened).includes(meaning));
+    button(reopened,'English Meaning').props.onClick();
+    preview=meaningHarness.render(ReviewerMeaning,{source:sentence.zh,reviewer:true});
     const hide=button(preview,'English Meaning');
     assert.equal(hide.props['aria-expanded'],true);
     hide.props.onClick();
-    preview=meaningHarness.render(ReviewerMeaning,{source:sentence.zh});
+    preview=meaningHarness.render(ReviewerMeaning,{source:sentence.zh,reviewer:true});
     assert.ok(!text(preview).includes(meaning));
   }
   assert.equal(localStorage.getItem('tb-assessments'),beforeAssessment);

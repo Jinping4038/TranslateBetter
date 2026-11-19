@@ -26,7 +26,7 @@ function createDraft(results) {
   };
 }
 
-export default function Assessment({assessments, onComplete, onPractice, onProgress, showHistory = false}) {
+export default function Assessment({assessments, onComplete, onPractice, onProgress, showHistory = false, reviewer = false}) {
   const [draft, setDraft] = useState(loadDraft);
   const [result, setResult] = useState(() => {
     const previousDraft = loadDraft();
@@ -147,7 +147,7 @@ export default function Assessment({assessments, onComplete, onPractice, onProgr
     <p className="muted">Translate independently. Your scores will appear after submission.</p>
     <div className="practice-top">Sentence {draft.index + 1} of 5</div>
     <progress className="assessment-progress" value={draft.index + 1} max="5" aria-label="Assessment progress"/>
-    <ReviewerMeaning key={draft.id+item.zh} source={item.zh}/>
+    <ReviewerMeaning key={draft.id+item.zh} source={item.zh} reviewer={reviewer}/>
     <form onSubmit={submit}>
       <div className="label-row"><label htmlFor="assessment-answer">Your translation</label></div>
       <div className="textarea-wrap">

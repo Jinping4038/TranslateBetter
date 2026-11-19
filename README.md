@@ -30,8 +30,8 @@ Practice Sessions counts valid, dated initial translations submitted for AI feed
 
 Progress checks: `node --test tests/*.test.mjs`.
 
-## Reviewer accessibility preview
+## Learner and Reviewer versions
 
-A first-visit Reviewer Note explains the target audience. “Got it” saves `tb-reviewer-notice-dismissed` in localStorage; normal refreshes and revisits do not reopen it. If browser storage is unavailable, dismissal lasts for the current visit only.
+First-time visitors choose Learner Version or Reviewer Version in a welcome dialog. The choice is stored as `tb-app-mode` in localStorage and can be changed with the fixed bottom-right switcher. Existing users without a selected mode see the new chooser once; the old reviewer-notice dismissal setting is left untouched. If storage is unavailable, mode selection lasts for the current visit.
 
-Practice and Assessment offer a collapsed-by-default “English Meaning” button inside the Chinese sentence card, alongside the existing audio control where available. The revealed text stays within that card and is labeled “English Meaning:”. All 100 Practice and 20 Assessment sentences have separately authored meaning glosses in `src/reviewer-meanings.js`, keyed by source text. These are reviewer previews rather than reference-answer replacements. Moving to another sentence hides the preview. This optional preview reveals source meaning for reviewers who do not read Chinese; normal assessment questions still show no hints, reference answers, feedback, or scores. Preview visibility never enters AI requests, stored results, scoring, or Progress calculations. No existing data migration is needed, including for active assessment drafts.
+Learner Version hides English-meaning controls in Practice and Assessment. Reviewer Version offers a collapsed-by-default English Meaning button within each sentence card. Separate glosses cover all 100 Practice and 20 Assessment sentences. Switching to Learner hides any open meaning; returning to Reviewer leaves it collapsed. Source sentences, audio controls, drafts, progress, revisions, assessment history, and scoring are unchanged. App mode is presentation-only and is not sent to AI or included in score calculations.
