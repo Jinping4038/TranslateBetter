@@ -409,7 +409,12 @@ test('App mode choice persists, switcher selects either mode, and meanings are r
   assert.equal(revisitHarness.render(RevisitedChooser,{mode:readAppMode(),onSelect}),null);
   revisitHarness.cleanup();
   const switcher=AppModeSwitcher({mode,onSelect});
-  nodes(switcher).find(node=>node.type==='select').props.onChange({target:{value:'reviewer'}});
+  assert.equal(nodes(switcher).filter(node=>node.type==='button').length,2);
+  assert.ok(!text(switcher).includes('App mode'));
+  assert.equal(button(switcher,'Learner Version').props['aria-pressed'],true);
+  button(switcher,'Reviewer Version').props.onClick();
+  const selectedSwitcher=AppModeSwitcher({mode,onSelect});
+  assert.equal(button(selectedSwitcher,'Reviewer Version').props['aria-pressed'],true);
   assert.equal(readAppMode(),'reviewer');
   assert.equal(localStorage.getItem('tb-assessments'),beforeAssessment);
   assert.equal(localStorage.getItem('tb-completed'),beforePractice);

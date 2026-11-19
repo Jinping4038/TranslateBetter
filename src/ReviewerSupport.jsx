@@ -29,11 +29,10 @@ export function AppModeChooser({mode,onSelect}) {
 }
 
 export function AppModeSwitcher({mode,onSelect}) {
-  return <label className="app-mode-switcher"><span>App mode</span>
-    <select aria-label="App version" value={mode||'learner'} onChange={event=>onSelect(event.target.value)}>
-      <option value="learner">Learner Version</option><option value="reviewer">Reviewer Version</option>
-    </select>
-  </label>;
+  return <div className="app-mode-switcher" role="group" aria-label="App version">
+    {[['learner','Learner Version'],['reviewer','Reviewer Version']].map(([value,label])=>
+      <button type="button" key={value} aria-pressed={mode===value} onClick={()=>onSelect(value)}>{label}</button>)}
+  </div>;
 }
 
 export function ReviewerMeaning({source, audio, reviewer=false}) {
