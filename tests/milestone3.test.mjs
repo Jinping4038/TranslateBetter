@@ -154,13 +154,16 @@ test('Milestone 3 regression flows with isolated storage and mocked AI',async()=
     assert.equal(nodes(tree).find(node=>node.props?.id==='revision').props.value,'My revised translation.');
     await nodes(tree).find(node=>node.type==='form').props.onSubmit(event);
     tree=harness.render(ReloadedApp);
-    assert.ok(text(tree).includes('Your Improvement'));
+    assert.ok(text(tree).includes('Revise Your Translation'));
+    assert.ok(nodes(tree).some(node=>node.type?.name==='RevisionComparison'));
+    assert.ok(!text(tree).includes('View AI Feedback'));
+    assert.equal(nodes(tree).find(node=>node.type?.name==='FeedbackCards').props.feedback.meaning,aiFeedback.meaning);
     assert.equal(JSON.parse(localStorage.getItem('tb-completed')).filter(item=>item.revision).length,1);
     assert.equal(JSON.parse(localStorage.getItem('tb-saved'))[0].history.length,2);
-    assert.equal(readPracticeSession().page,'comparison');
+    assert.equal(readPracticeSession().page,'revision');
     const versions=JSON.parse(localStorage.getItem('tb-saved'))[0].history;
     assert.equal(appendVersions(versions,JSON.parse(JSON.stringify(versions))).length,2);
-    button(tree,'View AI Feedback').props.onClick();
+    button(tree,'← Back').props.onClick();
     tree=harness.render(ReloadedApp);
     button(tree,'View Comparison').props.onClick();
     harness.render(ReloadedApp);
@@ -551,5 +554,70 @@ test('Assessment runs fixed A–D forms in order, resumes drafts, and retains ba
     assert.equal(nodes(history).find(node=>node.type==='tbody').props.children.length,5);
     assert.equal(JSON.parse(localStorage.getItem('tb-assessments')).length,5);
     assert.equal(localStorage.getItem('tb-completed'),null);
+  } finally {globalThis.fetch=originalFetch;}
+});
+
+test('Revision submissions stay inline with matching feedback, selectable comparisons, and persistent changes',async()=>{
+  globalThis.localStorage=storage();globalThis.sessionStorage=storage();
+  globalThis.window={addEventListener(){},removeEventListener(){}};
+  globalThis.document={getElementById(){return null;}};
+  const originalFetch=globalThis.fetch;
+  let round=0;
+  const response=()=>({...aiFeedback,meaning:'Feedback for version '+round,scores:{meaning:round+2,grammar:round+2,naturalness:round+2}});
+  try {
+    globalThis.fetch=async()=>Response.json({feedback:response()});
+    let flow=hooks();globalThis.__testReact=flow.react;
+    let {default:App}=await componentModule('src/main.jsx',true);
+    let page=flow.render(App);
+    button(page,'Start practicing').props.onClick();page=flow.render(App);
+    nodes(page).find(node=>node.props?.id==='translation').props.onChange({target:{value:'I learn things.'}});page=flow.render(App);
+    await nodes(page).find(node=>node.type==='form').props.onSubmit(event);page=flow.render(App);
+    await button(page,'Save to My Sentences').props.onClick();page=flow.render(App);
+    button(page,'Revise Translation').props.onClick();page=flow.render(App);
+    const source=nodes(page).find(node=>node.type?.name==='ReviewerMeaning').props.source;
+    for(round=1;round<=2;round++){
+      const revised=round===1?'I have learned things.':'I have learned many things.';
+      nodes(page).find(node=>node.props?.id==='revision').props.onChange({target:{value:revised}});page=flow.render(App);
+      await nodes(page).find(node=>node.type==='form').props.onSubmit(event);page=flow.render(App);
+      assert.equal(readPracticeSession().page,'revision');
+      assert.equal(nodes(page).find(node=>node.props?.id==='revision').props.value,revised);
+      assert.equal(nodes(page).find(node=>node.type?.name==='FeedbackCards').props.feedback.meaning,'Feedback for version '+round);
+      assert.equal(text(nodes(page).find(node=>node.props?.className==='revision-original')),'I learn things.');
+      assert.equal(nodes(page).find(node=>node.type?.name==='ReviewerMeaning').props.source,source);
+      assert.ok(nodes(page).some(node=>node.type?.name==='RevisionComparison'));
+    }
+    let comparison=nodes(page).find(node=>node.type?.name==='RevisionComparison');
+    comparison.props.onSelect(1);page=flow.render(App);
+    assert.equal(nodes(page).find(node=>node.type?.name==='FeedbackCards').props.feedback.meaning,'Feedback for version 1');
+    comparison=nodes(page).find(node=>node.type?.name==='RevisionComparison');
+    assert.equal(comparison.props.selectedRevision,1);
+    const {default:Comparison}=await componentModule('src/RevisionComparison.jsx');
+    let table=Comparison(comparison.props);
+    const scoreTable=nodes(table).find(node=>node.type?.name==='ScoreComparison');
+    assert.equal(scoreTable.props.original.scores.meaning,2);
+    assert.equal(scoreTable.props.revised.scores.meaning,3);
+    assert.ok(!nodes(table).some(node=>node.props?.id==='revision-text-changes'));
+    button(table,'Show Changes').props.onClick();page=flow.render(App);
+    comparison=nodes(page).find(node=>node.type?.name==='RevisionComparison');
+    table=Comparison(comparison.props);
+    assert.ok(nodes(table).some(node=>node.type==='ins'));
+    assert.ok(nodes(table).some(node=>node.type==='del'));
+    assert.equal(readPracticeSession().showChanges,true);
+    assert.equal(JSON.parse(localStorage.getItem('tb-saved'))[0].history.length,3);
+    flow.cleanup();
+
+    flow=hooks();globalThis.__testReact=flow.react;
+    ({default:App}=await componentModule('src/main.jsx',true));
+    page=flow.render(App);
+    assert.equal(nodes(page).find(node=>node.type?.name==='FeedbackCards').props.feedback.meaning,'Feedback for version 1');
+    comparison=nodes(page).find(node=>node.type?.name==='RevisionComparison');
+    assert.equal(comparison.props.expanded,true);
+    comparison.props.onSelect(2);page=flow.render(App);
+    assert.equal(nodes(page).find(node=>node.type?.name==='FeedbackCards').props.feedback.meaning,'Feedback for version 2');
+    assert.equal(nodes(page).find(node=>node.type?.name==='RevisionComparison').props.expanded,false);
+    const progress=practiceProgress(JSON.parse(localStorage.getItem('tb-completed')));
+    assert.equal(progress.practiceSessions,1);
+    assert.equal(progress.revisionsCompleted,2);
+    flow.cleanup();
   } finally {globalThis.fetch=originalFetch;}
 });

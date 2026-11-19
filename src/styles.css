@@ -177,3 +177,9 @@
 .assessment-back{margin-bottom:20px}
 
 .inline-result .feedback-card .score-badge{font-weight:500}
+
+.revision-comparison{margin-top:28px;padding-top:24px;border-top:1px solid var(--line)}
+.revision-comparison>h2{font-size:18px;margin-bottom:18px}
+.revision-text-changes{margin-top:20px}
+.revision-text-changes del{color:#8c3b3b;background:#fbe8e8;border-radius:3px;padding:1px 2px}
+.revision-text-changes ins{color:#236b4a;background:#e1f4e9;border-radius:3px;padding:1px 2px;text-decoration:none;border-bottom:2px solid #88c7a5}
