@@ -32,6 +32,6 @@ Progress checks: `node --test tests/*.test.mjs`.
 
 ## Learner and Reviewer versions
 
-First-time visitors choose Learner Version or Reviewer Version in a welcome dialog. The choice is stored as `tb-app-mode` in localStorage and can be changed with the fixed bottom-right switcher. Existing users without a selected mode see the new chooser once; the old reviewer-notice dismissal setting is left untouched. If storage is unavailable, mode selection lasts for the current visit.
+First-time visitors choose Learner Version or Reviewer Version in a welcome dialog. The choice is stored as `tb-app-mode` in localStorage and can be changed with the switcher in the top-right of the app header. Existing users without a selected mode see the new chooser once; the old reviewer-notice dismissal setting is left untouched. If storage is unavailable, mode selection lasts for the current visit.
 
 Learner Version hides English-meaning controls in Practice and Assessment. Reviewer Version offers a collapsed-by-default English Meaning button within each sentence card. Separate glosses cover all 100 Practice and 20 Assessment sentences. Switching to Learner hides any open meaning; returning to Reviewer leaves it collapsed. Source sentences, audio controls, drafts, progress, revisions, assessment history, and scoring are unchanged. App mode is presentation-only and is not sent to AI or included in score calculations.
