@@ -325,13 +325,21 @@ test('Milestone 3 regression flows with isolated storage and mocked AI',async()=
     selection=selectionHarness.render(SelectionApp);
     button(selection,'Need a hint?').props.onClick();
     selection=selectionHarness.render(SelectionApp);
-    assert.equal(button(selection,'Hide the hint').props['aria-expanded'],true);
+    assert.equal(button(selection,'Hide hints').props['aria-expanded'],true);
     button(selection,'Show Hint 2').props.onClick();
     selection=selectionHarness.render(SelectionApp);
-    button(selection,'Hide the hint').props.onClick();
+    button(selection,'Hide hints').props.onClick();
     selection=selectionHarness.render(SelectionApp);
     assert.equal(button(selection,'Need a hint?').props['aria-expanded'],false);
     assert.ok(!nodes(selection).some(node=>node.props?.id==='practice-hints'));
+    button(selection,'Need a hint?').props.onClick();
+    selection=selectionHarness.render(SelectionApp);
+    button(selection,'Show Hint 2');
+    assert.ok(!nodes(selection).some(node=>node.type==='strong'&&text(node)==='Hint 2'));
+    button(selection,'Hide hints').props.onClick();
+    selection=selectionHarness.render(SelectionApp);
+    assert.equal(button(selection,'Need a hint?').props['aria-expanded'],false);
+
     const firstSource=nodes(selection).find(node=>node.type?.name==='ReviewerMeaning').props.source;
     const practiceSupport=nodes(selection).find(node=>node.type?.name==='ReviewerMeaning');
     assert.equal(practiceSupport.props.reviewer,false);
