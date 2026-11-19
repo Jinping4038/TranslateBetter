@@ -323,6 +323,15 @@ test('Milestone 3 regression flows with isolated storage and mocked AI',async()=
     let selection=selectionHarness.render(SelectionApp);
     button(selection,'Start practicing').props.onClick();
     selection=selectionHarness.render(SelectionApp);
+    button(selection,'Need a hint?').props.onClick();
+    selection=selectionHarness.render(SelectionApp);
+    assert.equal(button(selection,'Hide the hint').props['aria-expanded'],true);
+    button(selection,'Show Hint 2').props.onClick();
+    selection=selectionHarness.render(SelectionApp);
+    button(selection,'Hide the hint').props.onClick();
+    selection=selectionHarness.render(SelectionApp);
+    assert.equal(button(selection,'Need a hint?').props['aria-expanded'],false);
+    assert.ok(!nodes(selection).some(node=>node.props?.id==='practice-hints'));
     const firstSource=nodes(selection).find(node=>node.type?.name==='ReviewerMeaning').props.source;
     const practiceSupport=nodes(selection).find(node=>node.type?.name==='ReviewerMeaning');
     assert.equal(practiceSupport.props.reviewer,false);
