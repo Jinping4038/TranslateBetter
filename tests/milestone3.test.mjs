@@ -186,7 +186,7 @@ test('Milestone 3 regression flows with isolated storage and mocked AI',async()=
       assert.ok(text(assessmentTree).includes('Check Your Translation Level'));
       assert.ok(!nodes(assessmentTree).some(node=>node.type==='form'));
       assert.equal(JSON.parse(localStorage.getItem('tb-assessment-draft')).id,draft.id);
-      button(assessmentTree,'Resume Assessment →').props.onClick();
+      button(assessmentTree,'Take Another Assessment').props.onClick();
       assessmentTree=assessmentHarness.render(Assessment,{...props,assessments,reviewer:round===1});
       assert.ok(!text(assessmentTree).includes('Hint 1'));
       assert.ok(!text(assessmentTree).includes(draft.items[4].en));
@@ -251,7 +251,7 @@ test('Milestone 3 regression flows with isolated storage and mocked AI',async()=
     let landing=landingHarness.render(LandingAssessment,{...props,assessments,showHistory:true});
     assert.ok(!text(landing).includes('Skill Breakdown'));
     assert.ok(!text(landing).includes('Start Practicing'));
-    button(landing,'Take Another Assessment →');
+    button(landing,'Take Another Assessment');
     landingHarness.cleanup();
     localStorage.setItem('tb-assessment-draft','null');
     const firstHarness=hooks();globalThis.__testReact=firstHarness.react;
@@ -260,7 +260,7 @@ test('Milestone 3 regression flows with isolated storage and mocked AI',async()=
     assert.ok(text(first).includes('Check Your Translation Level'));
     assert.ok(nodes(first).some(node=>node.type?.name==='AssessmentHistory'));
     assert.ok(!nodes(first).some(node=>node.type==='form'));
-    button(first,'Start Assessment →').props.onClick();
+    button(first,'Start Assessment').props.onClick();
     const started=firstHarness.render(FirstAssessment,{...props,assessments:[]});
     assert.ok(text(started).includes('Sentence 1 of 5'));
     assert.equal(JSON.parse(localStorage.getItem('tb-assessments')).length,2);
@@ -275,10 +275,19 @@ test('Milestone 3 regression flows with isolated storage and mocked AI',async()=
     assert.ok(nodes(historyPage).some(node=>node.type?.name==='AssessmentHistory'));
     assert.equal(localStorage.getItem('tb-assessment-draft'),draftBefore);
     assert.ok(!nodes(historyPage).some(node=>node.type==='form'));
-    button(historyPage,'Resume Assessment →').props.onClick();
+    button(historyPage,'Take Another Assessment').props.onClick();
     const resumed=historyHarness.render(HistoryAssessment,{...props,assessments,showHistory:true});
     assert.ok(text(resumed).includes('Sentence 2 of 5'));
     assert.equal(nodes(resumed).find(node=>node.props?.id==='assessment-answer').props.value,'Partial answer');
+    button(resumed,'Back to Assessment').props.onClick();
+    const returned=historyHarness.render(HistoryAssessment,{...props,assessments});
+    assert.ok(text(returned).includes('Check Your Translation Level'));
+    assert.ok(!text(returned).includes('Resume Assessment'));
+    button(returned,'Take Another Assessment').props.onClick();
+    const continued=historyHarness.render(HistoryAssessment,{...props,assessments});
+    assert.ok(text(continued).includes('Sentence 2 of 5'));
+    assert.equal(nodes(continued).find(node=>node.props?.id==='assessment-answer').props.value,'Partial answer');
+
     assert.equal(localStorage.getItem('tb-assessment-draft'),draftBefore);
     historyHarness.cleanup();
     assert.ok(text(progress).includes('Revisions Completed1'));

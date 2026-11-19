@@ -114,7 +114,7 @@ export default function Assessment({assessments, onComplete, onPractice, onProgr
         <button className="primary" onClick={()=>{
           if(draft&&!assessments.some(item=>item.id===draft.id)){setActive(true);setError('');}
           else start();
-        }}>{draft&&!assessments.some(item=>item.id===draft.id)?'Resume Assessment':assessments.length?'Take Another Assessment':'Start Assessment'} <span aria-hidden="true">→</span></button>
+        }}>{draft||assessments.length?'Take Another Assessment':'Start Assessment'}</button>
       </div>
       <svg className="assessment-banner-art" viewBox="0 0 180 180" fill="none" aria-hidden="true">
         <rect x="37" y="30" width="112" height="137" rx="16" fill="#e4dcff"/>
@@ -129,6 +129,7 @@ export default function Assessment({assessments, onComplete, onPractice, onProgr
   </main>;
 
   if (draft.submitted) return <main className="utility assessment-page">
+    <button type="button" className="secondary" disabled={busy} onClick={()=>{setActive(false);setError('');}}>Back to Assessment</button>
     <h1>Assessment Submitted</h1>
     <p>Your answers are locked while the assessment is scored.</p>
     <p role="status">{graded || draft.items.filter(item => item.scores).length} of 5 answers scored.</p>
@@ -139,6 +140,7 @@ export default function Assessment({assessments, onComplete, onPractice, onProgr
   const item = draft.items[draft.index];
   const allAnswered = draft.items.every(answer => answer.answer.trim());
   return <main className="practice-main assessment-page">
+    <button type="button" className="secondary" onClick={()=>{setActive(false);setError('');}}>Back to Assessment</button>
     <h1>Assessment</h1>
     <p className="muted">Translate independently. Your scores will appear after submission.</p>
     <div className="practice-top">Sentence {draft.index + 1} of 5</div>
