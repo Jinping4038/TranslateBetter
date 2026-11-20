@@ -210,7 +210,7 @@ return <div className="app"><AppModeChooser mode={appMode} onSelect={selectAppMo
 <div className="workspace">
 {<aside className="sidebar"><div>{nav.map(([id,label,Icon])=><button key={id} className={page===id||(id==='assessment'&&page==='assessment-history')||(id==='practice'&&['revision','comparison'].includes(page))||(id==='saved'&&page==='saved-detail')?'selected':''} onClick={()=>setPage(id)}><Icon size={19}/>{label}</button>)}</div><div className="goal"><span>Today’s goal</span><div><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="16"/><circle cx="20" cy="20" r="16" style={{strokeDasharray:`${Math.min(todayCount,10)*10.05} 101`}}/></svg><strong>{Math.min(todayCount,10)} <small>/ 10<br/>sentences</small></strong></div><p>{todayCount>=10?'Goal reached. Nice work!':'You’re building a good habit.'}</p></div></aside>}
 {['assessment','assessment-history'].includes(page)?<Assessment key={page} reviewer={appMode==='reviewer'} showHistory={page==='assessment-history'} assessments={assessments} onComplete={completeAssessment} onPractice={()=>setPage('practice')} onProgress={()=>setPage('progress')}/>:page==='saved-detail'?<main className="utility revision-view">
-  <button className="secondary" onClick={()=>setPage('saved')}>← Back to My Sentences</button>
+  <button className="secondary" onClick={()=>setPage('saved')}>Back to My Sentences</button>
   <h1 className="saved-detail-title">{selectedSentence.zh}</h1>
   <p className="muted">Reference answer · {selectedSentence.en}</p>
   <h2>Your Translation History</h2>
