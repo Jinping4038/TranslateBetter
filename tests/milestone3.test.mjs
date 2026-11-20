@@ -371,13 +371,9 @@ test('Milestone 3 regression flows with isolated storage and mocked AI',async()=
     button(selection,'Next sentence').props.onClick();
     selection=selectionHarness.render(SelectionApp);
     assert.equal(nodes(selection).find(node=>node.type?.name==='ReviewerMeaning').props.source,nextSource);
-    button(selection,'Settings').props.onClick();
-    selection=selectionHarness.render(SelectionApp);
-    const preferences=nodes(selection).find(node=>node.type?.name==='PracticePreferences');
-    assert.equal(preferences.props.preferences.prioritizeUnseen,true);
-    preferences.props.onChange('prioritizeUnseen',false);
-    selection=selectionHarness.render(SelectionApp);
-    assert.equal(JSON.parse(localStorage.getItem('tb-practice-preferences')).prioritizeUnseen,false);
+    assert.ok(!nodes(selection).some(node=>node.type==='button'&&text(node)==='Settings'));
+    // Preferences saved before Settings was hidden must survive revisits.
+    localStorage.setItem('tb-practice-preferences',JSON.stringify({prioritizeUnseen:false,repeatLowerScores:true}));
     assert.equal(localStorage.getItem('tb-saved'),preservedSaved);
     assert.equal(localStorage.getItem('tb-assessments'),preservedAssessments);
     const pathBefore=readPracticeSession().practiceTrail;
@@ -385,7 +381,8 @@ test('Milestone 3 regression flows with isolated storage and mocked AI',async()=
     const refreshedSelection=hooks();globalThis.__testReact=refreshedSelection.react;
     const {default:RefreshedSelectionApp}=await componentModule('src/main.jsx',true);
     selection=refreshedSelection.render(RefreshedSelectionApp);
-    assert.equal(nodes(selection).find(node=>node.type?.name==='PracticePreferences').props.preferences.prioritizeUnseen,false);
+    assert.equal(JSON.parse(localStorage.getItem('tb-practice-preferences')).prioritizeUnseen,false);
+    assert.ok(!nodes(selection).some(node=>node.type?.name==='PracticePreferences'));
     assert.deepEqual(readPracticeSession().practiceTrail,pathBefore);
     button(selection,'Practice').props.onClick();
     selection=refreshedSelection.render(RefreshedSelectionApp);
@@ -415,6 +412,17 @@ test('Milestone 3 regression flows with isolated storage and mocked AI',async()=
     assert.equal(afterRevision.practiceSessions,afterReplay.practiceSessions);
     assert.equal(afterRevision.revisionsCompleted,afterReplay.revisionsCompleted+1);
     refreshedSelection.cleanup();
+    const oldSettingsDraft={...readPracticeSession(),page:'settings'};
+    sessionStorage.setItem('tb-active-practice',JSON.stringify(oldSettingsDraft));
+    const settingsRedirect=hooks();globalThis.__testReact=settingsRedirect.react;
+    const {default:RedirectedApp}=await componentModule('src/main.jsx',true);
+    const redirected=settingsRedirect.render(RedirectedApp);
+    button(redirected,'Start practicing');
+    assert.equal(readPracticeSession().page,'home');
+    assert.equal(JSON.parse(localStorage.getItem('tb-practice-preferences')).prioritizeUnseen,false);
+    assert.equal(localStorage.getItem('tb-assessments'),preservedAssessments);
+    settingsRedirect.cleanup();
+
 
   } finally {
     globalThis.fetch=originalFetch;
